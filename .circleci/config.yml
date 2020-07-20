@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 
 aliases:
   - &onlymaster
@@ -36,10 +36,10 @@ jobs:
           command: npm publish --access public   
           
 workflows:
-  version: 2
+  version: 2.1
   deploy:
     jobs:
       - deploy:
-          package_dir: fbcnms-strings
-          package_name: fbcnms/strings
-          <<: *onlymaster
+        package_dir: fbcnms-strings
+        package_name: fbcnms/strings
+        <<: *onlymaster
