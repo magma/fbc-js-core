@@ -1,5 +1,11 @@
 version: 2
 
+aliases:
+  - &onlymaster
+    filters:
+      branches:
+        only: master
+
 jobs:
   deploy:
     docker:
@@ -7,18 +13,28 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN_FBCNMS" > ~/.npmrc
+          working_directory: project/fbcnms-packages/<<parameters.package_dir>>
+          name: End step if version has not changed
+          command: |
+            published=$(npm -s show <<parameters.package_name>> version)
+            current=$(node -p "require('./package.json').version")
+            if [[ $published == $current ]]; then
+              circleci step halt
+            fi
       - run:
-          name: Publish package
-          command: cd ~/project/fbcnms-packages/fbcnms-strings && npm publish
-          
+          name: Authenticate with registry
+          working_directory: ~/project/fbcnms-packages/<<parameters.package_dir>>
+          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+      - run:
+          name: npm publish
+          working_directory: project/fbcnms-packages/<<parameters.package_dir>>
+          command: npm publish --access public   
           
 workflows:
   version: 2
   deploy:
     jobs:
       - deploy:
-          filters:
-            branches:
-              only: master
+          package_dir: fbcnms-strings
+          package_name: fbcnms/strings
+          <<: *onlymaster
