@@ -34,12 +34,13 @@ jobs:
           name: npm publish
           working_directory: project/fbcnms-packages/<<parameters.package_dir>>
           command: npm publish --access public   
-          
+
 workflows:
   version: 2.1
   deploy:
     jobs:
       - deploy:
-        package_dir: fbcnms-strings
-        package_name: fbcnms/strings
-        <<: *onlymaster
+          name: deploy-fbcnms-strings
+          package_dir: fbcnms-strings
+          package_name: fbcnms/strings
+          <<: *onlymaster
