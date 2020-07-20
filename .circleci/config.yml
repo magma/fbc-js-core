@@ -49,3 +49,30 @@ workflows:
           package_dir: fbcnms-util
           package_name: fbcnms/util
           <<: *onlymaster
+      - deploy:
+          name: deploy-fbcnms-ui
+          package_dir: fbcnms-ui
+          package_name: fbcnms/ui
+          <<: *onlymaster
+      - deploy:
+          name: deploy-fbcnms-relay
+          package_dir: fbcnms-relay
+          package_name: fbcnms/relay
+          <<: *onlymaster
+      - deploy:
+          name: deploy-fbcnms-relay
+          package_dir: fbcnms-relay
+          package_name: fbcnms/relay
+          <<: *onlymaster
+      - deploy:
+          name: deploy-fbcnms-babel-register
+          package_dir: fbcnms-babel-register
+          package_name: fbcnms/babel-register
+          <<: *onlymaster
+      # TODO: Rename "fbcnms-webpack-config" to fbcnms/webpack-config first.
+      #
+      # - deploy:
+      #    name: deploy-fbcnms-webpack-config
+      #    package_dir: fbcnms-webpack-config
+      #    package_name: fbcnms/webpack-config
+      #    <<: *onlymaster
