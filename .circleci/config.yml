@@ -8,10 +8,10 @@ jobs:
       - checkout
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN_FBCNMS" > ~/.npmrc
       - run:
           name: Publish package
-          command: cd ~/fbcnms-packages/fbcnms-auth && npm publish
+          command: cd ~/project/fbcnms-packages/fbcnms-strings && npm publish
           
           
 workflows:
