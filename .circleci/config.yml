@@ -10,6 +10,11 @@ jobs:
   deploy:
     docker:
       - image: circleci/node
+    parameters:
+      package_dir:
+        type: string
+      package_name:
+        type: string
     steps:
       - checkout
       - run:
