@@ -21,7 +21,7 @@ jobs:
           name: Halt on no changes 
           working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: |
-            published=$(npm -s show <<parameters.package_name>> version)
+            published=$(npm -s show <<parameters.package_name>> version || exit 0)
             current=$(node -p "require('./package.json').version")
             if [[ $published == $current ]]; then
               circleci step halt
