@@ -18,7 +18,7 @@ jobs:
     steps:
       - checkout
       - run:
-          working_directory: project/fbcnms-packages/<<parameters.package_dir>>
+          working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: |
             published=$(npm -s show <<parameters.package_name>> version)
             current=$(node -p "require('./package.json').version")
@@ -27,11 +27,11 @@ jobs:
             fi
       - run:
           name: npn auth
-          working_directory: ~/project/fbcnms-packages/<<parameters.package_dir>>
+          working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
           name: npm publish
-          working_directory: project/fbcnms-packages/<<parameters.package_dir>>
+          working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: npm publish --access public   
 
 workflows:
