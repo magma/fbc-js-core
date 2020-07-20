@@ -19,7 +19,6 @@ jobs:
       - checkout
       - run:
           working_directory: project/fbcnms-packages/<<parameters.package_dir>>
-          name: End step if version has not changed
           command: |
             published=$(npm -s show <<parameters.package_name>> version)
             current=$(node -p "require('./package.json').version")
@@ -27,7 +26,7 @@ jobs:
               circleci step halt
             fi
       - run:
-          name: Authenticate with registry
+          name: npn auth
           working_directory: ~/project/fbcnms-packages/<<parameters.package_dir>>
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
