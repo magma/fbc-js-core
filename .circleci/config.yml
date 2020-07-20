@@ -12,7 +12,8 @@ jobs:
       - run:
           name: Publish package
           command: cd ~/fbcnms-packages/fbcnms-auth && npm publish
-
+          
+          
 workflows:
   version: 2
   deploy:
