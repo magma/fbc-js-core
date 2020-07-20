@@ -18,6 +18,7 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Halt on no changes 
           working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: |
             published=$(npm -s show <<parameters.package_name>> version)
@@ -42,4 +43,9 @@ workflows:
           name: deploy-fbcnms-strings
           package_dir: fbcnms-strings
           package_name: fbcnms/strings
+          <<: *onlymaster
+      - deploy:
+          name: deploy-fbcnms-util
+          package_dir: fbcnms-util
+          package_name: fbcnms/util
           <<: *onlymaster
