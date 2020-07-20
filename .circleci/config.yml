@@ -1,16 +1,11 @@
 version: 2
 
-defaults: &defaults
-  working_directory: ~/
-  docker:
-    - image: circleci/node:8.9.1
-
 jobs:
   deploy:
-    <<: *defaults
+    docker:
+      - image: circleci/node
     steps:
-      - attach_workspace:
-          at: ~/
+      - checkout
       - run:
           name: Authenticate with registry
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
