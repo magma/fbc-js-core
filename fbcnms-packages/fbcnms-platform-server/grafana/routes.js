@@ -44,20 +44,33 @@ const grafanaAdminClient = Client(GRAFANA_URL, {
 const syncGrafana = () => {
   return async function (req: FBCNMSRequest, res, next) {
     const tasksCompleted = [];
+
+    // Sync Tenants - Do this async since result does not affect other syncs
+    const tenantsPromise = syncTenants();
+
     // Sync User/Organization
     const userRes = await syncGrafanaUser(grafanaAdminClient, req);
     tasksCompleted.push(...userRes.completedTasks);
     if (userRes.errorTask) {
       return await displayErrorMessage(res, tasksCompleted, userRes.errorTask);
     }
+
     // Sync Datasource
     const dsRes = await syncDatasource(grafanaAdminClient, req);
     tasksCompleted.push(...dsRes.completedTasks);
     if (dsRes.errorTask) {
       return await displayErrorMessage(res, tasksCompleted, dsRes.errorTask);
     }
-    // Sync Tenants
-    const tenantsRes = await syncTenants();
+
+    // Create Dashboards
+    const dbRes = await syncDashboards(grafanaAdminClient, req);
+    tasksCompleted.push(...dbRes.completedTasks);
+    if (dbRes.errorTask) {
+      return await displayErrorMessage(res, tasksCompleted, dbRes.errorTask);
+    }
+
+    // Get syncTenants result
+    const tenantsRes = await tenantsPromise;
     tasksCompleted.push(...tenantsRes.completedTasks);
     if (tenantsRes.errorTask) {
       return await displayErrorMessage(
@@ -65,12 +78,6 @@ const syncGrafana = () => {
         tasksCompleted,
         tenantsRes.errorTask,
       );
-    }
-    // Create Dashboards
-    const dbRes = await syncDashboards(grafanaAdminClient, req);
-    tasksCompleted.push(...dbRes.completedTasks);
-    if (dbRes.errorTask) {
-      return await displayErrorMessage(res, tasksCompleted, dbRes.errorTask);
     }
     return next();
   };
