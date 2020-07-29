@@ -17,6 +17,9 @@ yarn run test
 
 Run `yarn test --coverage`
 
+## Contributing
+In order to contribute to `fbc-js-core`, see the [CONTRIBUTING](CONTRIBUTING.md) file for how to go get started.  
+
 ## License
 
-fbc-js-core is BSD License licensed, as found in the LICENSE file.
+fbc-js-core is BSD License licensed, as found in the [LICENSE file](LICENSE).
