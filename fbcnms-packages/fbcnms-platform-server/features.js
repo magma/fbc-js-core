@@ -228,7 +228,7 @@ export const arrayConfigs = [
   {
     id: 'async_export',
     title: 'Asynchronous location export',
-    enabledByDefault: false
+    enabledByDefault: false,
   },
 ];
 
