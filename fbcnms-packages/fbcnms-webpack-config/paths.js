@@ -24,5 +24,8 @@ module.exports = {
   appSrc: resolveApp('app'),
   distPath: resolveApp('static/dist'),
   packagesDir: resolveApp('../../fbcnms-packages'),
+  fbcnmsDir: path.dirname(
+    path.dirname(require.resolve('@fbcnms/babel-register')),
+  ),
   resolveApp,
 };

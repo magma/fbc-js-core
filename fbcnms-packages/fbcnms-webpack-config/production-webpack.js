@@ -62,11 +62,12 @@ function createProductionWebpackConfig(options: Options) {
               include: [
                 paths.appSrc,
                 paths.packagesDir,
+                paths.fbcnmsDir,
                 ...(options.extraPaths || []),
               ],
               loader: require.resolve('babel-loader'),
               options: {
-                configFile: '../../babel.config.js',
+                rootMode: 'upward',
                 // This is a feature of `babel-loader` for webpack (not Babel
                 // itself). It enables caching results in
                 // ./node_modules/.cache/babel-loader/ directory for faster
