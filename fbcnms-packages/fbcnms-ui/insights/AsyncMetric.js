@@ -363,7 +363,7 @@ export default function AsyncMetric(props: Props) {
   }
   return (
     <Line
-      height={props.height ?? null}
+      height={props.height}
       options={{
         maintainAspectRatio: false,
         scaleShowValues: true,
