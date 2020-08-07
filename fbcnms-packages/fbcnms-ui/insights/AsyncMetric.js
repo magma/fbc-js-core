@@ -54,6 +54,7 @@ type Props = {
   startEnd?: [moment, moment],
   networkId?: string,
   style?: ChartStyle,
+  height?: number
 };
 
 const useStyles = makeStyles(() => ({
@@ -362,7 +363,7 @@ export default function AsyncMetric(props: Props) {
   }
   return (
     <Line
-      height={300}
+      height={props.height ?? null}
       options={{
         maintainAspectRatio: false,
         scaleShowValues: true,
