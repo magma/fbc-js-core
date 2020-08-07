@@ -130,7 +130,7 @@ const RANGE_VALUES: {[TimeRange]: RangeValue} = {
   },
 };
 
-const COLORS = ['#3984FF', 'red', 'green', 'yellow', 'purple', 'black'];
+const COLORS = ['blue', 'red', 'green', 'yellow', 'purple', 'black'];
 
 interface DatabaseHelper<T> {
   getLegendLabel(data: T, tagSets: Array<{[string]: string}>): string;
@@ -304,8 +304,8 @@ function useDatasetsFetcher(props: Props) {
                 pointHitRadius: 10,
                 pointRadius: style ? style.data.pointRadius : 0,
                 borderWidth: 2,
-                backgroundColor: getColorForIndex(index),
-                borderColor: getColorForIndex(index++),
+                backgroundColor: props.backgroundColor ?? getColorForIndex(index),
+                borderColor: props.backgroundColor ?? getColorForIndex(index++),
                 data: it[dbHelper.datapointFieldName].map(i => ({
                   t: parseInt(i[0]) * 1000,
                   y: parseFloat(i[1]),
