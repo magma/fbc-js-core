@@ -304,7 +304,8 @@ function useDatasetsFetcher(props: Props) {
                 pointHitRadius: 10,
                 pointRadius: style ? style.data.pointRadius : 0,
                 borderWidth: 2,
-                backgroundColor: props.backgroundColor ?? getColorForIndex(index),
+                backgroundColor: 
+                  props.backgroundColor ?? getColorForIndex(index),
                 borderColor: props.backgroundColor ?? getColorForIndex(index++),
                 data: it[dbHelper.datapointFieldName].map(i => ({
                   t: parseInt(i[0]) * 1000,
