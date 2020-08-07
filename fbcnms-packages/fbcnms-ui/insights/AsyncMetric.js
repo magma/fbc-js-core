@@ -129,7 +129,7 @@ const RANGE_VALUES: {[TimeRange]: RangeValue} = {
   },
 };
 
-const COLORS = ['blue', 'red', 'green', 'yellow', 'purple', 'black'];
+const COLORS = ['#3984FF', 'red', 'green', 'yellow', 'purple', 'black'];
 
 interface DatabaseHelper<T> {
   getLegendLabel(data: T, tagSets: Array<{[string]: string}>): string;
@@ -362,6 +362,7 @@ export default function AsyncMetric(props: Props) {
   }
   return (
     <Line
+      height={300}
       options={{
         maintainAspectRatio: false,
         scaleShowValues: true,
