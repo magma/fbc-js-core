@@ -1,4 +1,4 @@
-[ignore]
+[ignore] 
 
 ; Ignore components that we dont care if they match our flow
 .*/node_modules/bcryptjs/.*
