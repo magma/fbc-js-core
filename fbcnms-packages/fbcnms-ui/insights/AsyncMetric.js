@@ -55,6 +55,7 @@ type Props = {
   networkId?: string,
   style?: ChartStyle,
   height?: number,
+  backgroundColor?: string,
 };
 
 const useStyles = makeStyles(() => ({
