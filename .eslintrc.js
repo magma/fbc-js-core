@@ -92,6 +92,7 @@ module.exports.overrides = [
       'fbcnms-packages/fbcnms-ui/stories/**/*.js',
       'fbcnms-packages/fbcnms-util/**/*.js',
       'fbcnms-packages/fbcnms-webpack-config/**/*.js',
+      'fbcnms-packages/symphony-design-system/**/*.js',
       'fbcnms-projects/*/config/webpack.*.js',
       'fbcnms-projects/*/scripts/**/*.js',
       'fbcnms-projects/*/server/**/*.js',

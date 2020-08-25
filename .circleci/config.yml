@@ -185,3 +185,8 @@ workflows:
           package_dir: eslint-config-fbcnms
           package_name: eslint-config-fbcnms
           <<: *onlymaster
+      - deploy:
+          name: deploy-symphony-design-system
+          package_dir: symphony-design-system
+          package_name: fbcsymphony/design-system
+          <<: *onlymaster
