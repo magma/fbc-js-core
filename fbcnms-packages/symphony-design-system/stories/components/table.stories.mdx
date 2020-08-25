@@ -1,0 +1,368 @@
+import Button from '../../components/Button';
+import Checkbox from '../../components/Checkbox/Checkbox';
+import RadioGroup from '../../components/RadioGroup/RadioGroup';
+import Table from '../../components/Table/Table';
+import Text from '../../components/Text';
+import ThreeDotsVerticalIcon from '../../icons/Actions/ThreeDotsVerticalIcon';
+import {Meta, Preview, Story} from '@storybook/addon-docs/blocks';
+import {ROW_SEPARATOR_TYPES} from '../../components/Table/TableContent';
+import {STORY_CATEGORIES} from '../storybookUtils';
+import {TABLE_SORT_ORDER} from '../../components/Table/TableContext';
+import {TABLE_VARIANT_TYPES} from '../../components/Table/Table';
+import {makeStyles} from '@material-ui/styles';
+import {useMemo, useState} from 'react';
+
+export const FIRST_NAMES = [
+  'Meghan',
+  'Sara',
+  'Dolev',
+  'Walter',
+  'Harlan',
+  'Hakim',
+  'Ibrar',
+  'Walter',
+  'Karl',
+  'Sara',
+  'Caitlin',
+  'Emil',
+];
+
+export const LAST_NAMES = [
+  'Bishop',
+  'Porter',
+  'Hadar',
+  'Jenning',
+  'Decker',
+  'Cortes',
+  'Brooks',
+  'Jenning',
+  'Noble',
+  'Porter',
+  'Tran',
+  'Haigh',
+];
+
+export const CITIES = [
+  'Raanana',
+  'Tel Aviv',
+  'Ramat Gan',
+  'Austin',
+  'Rosh HaHayin',
+  'Portland',
+  'New York',
+];
+
+export const STARTING_DATES = [
+  new Date('Febuary 13, 2020'),
+  new Date('Febuary 28, 1999'),
+  new Date('May 02, 1990'),
+  new Date('July 11, 2001'),
+  new Date('Febuary 16, 2020'),
+  new Date('March 5, 1999'),
+];
+
+export const TITILES = ['Mr.', 'Ms.', 'Dr.', 'Don', ''];
+
+export const generateRandomRow = () => ({
+  key: Math.floor(Math.random() * 1000000),
+  firstName: FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)],
+  lastName: LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)],
+  age: Math.floor(Math.random() * 110) + 10,
+  startingDate:
+    STARTING_DATES[Math.floor(Math.random() * STARTING_DATES.length)],
+  city: CITIES[Math.floor(Math.random() * CITIES.length)],
+  title: TITILES[Math.floor(Math.random() * TITILES.length)],
+});
+
+export const DATA = [...Array(16).fill().map(generateRandomRow)];
+
+export const useStyles = makeStyles(() => ({
+  root: {
+    width: '100%',
+  },
+  table: {
+    marginBottom: '24px',
+  },
+  optionsContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    marginTop: '32px',
+  },
+  displayMenuOption: {
+    marginTop: '4px',
+    display: 'flex',
+    alignItems: 'top',
+  },
+  optionCheckbox: {
+    marginTop: '4px',
+  },
+  iconColumn: {
+    width: '36px',
+  },
+}));
+
+<Meta title={`${STORY_CATEGORIES.COMPONENTS}/Table`} />
+
+# Table
+
+```js
+import Table from '@fbcsymphony/design-system/components/Table';
+```
+
+`Table` supports sorting, row selection, active rows and showing a details card.
+
+In addition, you can customize the look with the `variant` and `dataRowsSeparator` props.
+
+<Preview>
+  <Story name="Table">
+    {() => {
+      const classes = useStyles();
+      const [showSelection, setShowSelection] = useState(false);
+      const [resizableColumns, setResizableColumns] = useState(false);
+      const [selectedIds, setSelectedIds] = useState([]);
+      const [paginationKey, setPaginationKey] = useState(0);
+      const [showPagination, setShowPagination] = useState(false);
+      const [showSorting, setShowSorting] = useState(false);
+      const [sortSettings, setSortSettings] = useState({
+        columnKey: 'title',
+        order: TABLE_SORT_ORDER.ascending,
+      });
+      const [data, setData] = useState(DATA.slice(0, 4));
+      const columns = useMemo(
+        () => [
+          {
+            key: 'title',
+            title: 'Title',
+            render: row => row.title || '',
+            getSortingValue: showSorting ? row => row.title : undefined,
+          },
+          {
+            key: 'firstName',
+            title: 'First Name',
+            render: row => row.firstName,
+            getSortingValue: showSorting ? row => row.firstName : undefined,
+            width: 0.2,
+          },
+          {
+            key: 'lastName',
+            title: 'Last Name',
+            render: row => row.lastName,
+          },
+          {
+            key: 'age',
+            title: 'Age',
+            render: row => row.age,
+            getSortingValue: showSorting ? row => row.age : undefined,
+          },
+          {
+            key: 'startingDate',
+            title: 'Starting Date',
+            render: row =>
+              Intl.DateTimeFormat('default').format(row.startingDate),
+            getSortingValue: showSorting
+              ? row => row.startingDate.getTime()
+              : undefined,
+          },
+          {
+            key: 'city',
+            title: 'City',
+            render: row => (
+              <Button
+                variant="text"
+                onClick={() => alert(`clicked ${row.city}`)}>
+                {row.city}
+              </Button>
+            ),
+            getSortingValue: showSorting ? row => row.city : undefined,
+          },
+          {
+            key: 'menu_icon',
+            title: '',
+            titleClassName: classes.iconColumn,
+            className: classes.iconColumn,
+            render: _row => (
+              <Button variant="text" onClick={() => alert(`menu opening`)}>
+                <ThreeDotsVerticalIcon color="gray" />
+              </Button>
+            ),
+            width: 36,
+          },
+        ],
+        [classes.iconColumn, showSorting],
+      );
+      const [rowsSeparator, setRowsSeparator] = useState(
+        ROW_SEPARATOR_TYPES.bands,
+      );
+      const [tableVariant, setTableVariant] = useState(
+        TABLE_VARIANT_TYPES.standalone,
+      );
+      const [showActiveRow, setShowActiveRow] = useState(false);
+      const [activeRowId, setActiveRowId] = useState(null);
+      const [showDetailsCard, setShowDetailsCard] = useState(false);
+      const tableProps = useMemo(
+        () => ({
+          data,
+          columns: columns,
+          variant: tableVariant,
+          dataRowsSeparator: rowsSeparator,
+          sortSettings: showSorting ? sortSettings : undefined,
+          onSortChanged: newSettings => setSortSettings(newSettings),
+          paginationSettings: showPagination
+            ? {
+                loadNext: onCompleted => {
+                  setTimeout(() => {
+                    onCompleted();
+                    setData(DATA.slice(0, data.length + 4));
+                  }, 300);
+                },
+                loadPrevious: onCompleted => {
+                  onCompleted();
+                },
+                pageSize: 4,
+                totalRowsCount: 16,
+              }
+            : undefined,
+          resizableColumns,
+          showSelection: showSelection,
+          selectedIds: showSelection ? selectedIds : undefined,
+          onSelectionChanged: showSelection ? setSelectedIds : undefined,
+          activeRowId: showActiveRow ? activeRowId : undefined,
+          onActiveRowIdChanged: showActiveRow ? setActiveRowId : undefined,
+          detailsCard: showDetailsCard ? (
+            <div>
+              <div>
+                <Text variant="h6">
+                  Here you can show some intersting details
+                </Text>
+              </div>
+              <div>
+                <Text variant="subtitle2">
+                  Usually be used with 'activeRow'
+                </Text>
+              </div>
+            </div>
+          ) : undefined,
+        }),
+        [
+          activeRowId,
+          columns,
+          rowsSeparator,
+          selectedIds,
+          showActiveRow,
+          showDetailsCard,
+          showSelection,
+          showSorting,
+          resizableColumns,
+          tableVariant,
+          showPagination,
+          data,
+          sortSettings,
+        ],
+      );
+      return (
+        <div className={classes.root}>
+          <div className={classes.table}>
+            <Table {...tableProps} />
+          </div>
+          <div className={classes.optionsContainer}>
+            <Checkbox
+              className={classes.optionCheckbox}
+              title="With Sorting"
+              checked={showSorting}
+              onChange={selection =>
+                setShowSorting(selection === 'checked' ? true : false)
+              }
+            />
+            <Checkbox
+              className={classes.optionCheckbox}
+              title="Resizable Columns"
+              checked={resizableColumns}
+              onChange={selection =>
+                setResizableColumns(selection === 'checked' ? true : false)
+              }
+            />
+            <Checkbox
+              className={classes.optionCheckbox}
+              checked={showSelection}
+              title="With Selection"
+              onChange={selection =>
+                setShowSelection(selection === 'checked' ? true : false)
+              }
+            />
+            <Checkbox
+              className={classes.optionCheckbox}
+              title="With Pagination"
+              checked={showPagination}
+              onChange={selection =>
+                setShowPagination(selection === 'checked' ? true : false)
+              }
+            />
+            <Checkbox
+              className={classes.optionCheckbox}
+              checked={showActiveRow}
+              title="Row can be active (clickable)"
+              onChange={selection =>
+                setShowActiveRow(selection === 'checked' ? true : false)
+              }
+            />
+            <Checkbox
+              className={classes.optionCheckbox}
+              checked={showDetailsCard}
+              title="Details Card Shown"
+              onChange={selection =>
+                setShowDetailsCard(selection === 'checked' ? true : false)
+              }
+            />
+            <div className={classes.displayMenuOption}>
+              <div>
+                <Text>Row Separation Type: </Text>
+              </div>
+              <RadioGroup
+                options={[
+                  {
+                    value: 'bands',
+                    label: `'${ROW_SEPARATOR_TYPES.bands}'`,
+                    details: 'Rows are banded with stripes',
+                  },
+                  {
+                    value: 'border',
+                    label: `'${ROW_SEPARATOR_TYPES.border}'`,
+                    details: 'Rows have light border in between',
+                  },
+                  {
+                    value: 'none',
+                    label: `'${ROW_SEPARATOR_TYPES.none}'`,
+                    details: 'Rows have no visual separation',
+                  },
+                ]}
+                value={rowsSeparator}
+                onChange={value => setRowsSeparator(ROW_SEPARATOR_TYPES[value])}
+              />
+            </div>
+            <div className={classes.displayMenuOption}>
+              <div>
+                <Text>Table Variant: </Text>
+              </div>
+              <RadioGroup
+                options={[
+                  {
+                    value: 'standalone',
+                    label: `'${TABLE_VARIANT_TYPES.standalone}'`,
+                    details: 'Table is shown elevated',
+                  },
+                  {
+                    value: 'embedded',
+                    label: `'${TABLE_VARIANT_TYPES.embedded}'`,
+                    details: 'No elevation and no inner padding',
+                  },
+                ]}
+                value={tableVariant}
+                onChange={value => setTableVariant(TABLE_VARIANT_TYPES[value])}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }}
+  </Story>
+</Preview>
