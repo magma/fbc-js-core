@@ -242,7 +242,7 @@ export const arrayConfigs = [
   },
   {
     id: 'workorder_new_status',
-    title: 'Work Order New Status'
+    title: 'Work Order New Status',
     enabledByDefault: false,
   },
 ];
