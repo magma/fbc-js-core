@@ -12,7 +12,6 @@ import type {ExpressResponse} from 'express';
 import type {FBCNMSRequest} from '@fbcnms/auth/access';
 import type {FeatureID} from '@fbcnms/types/features';
 
-import MagmaV1API from '../magma';
 import asyncHandler from '@fbcnms/util/asyncHandler';
 import express from 'express';
 import featureConfigs from '../features';
