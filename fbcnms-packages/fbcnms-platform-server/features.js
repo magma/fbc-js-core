@@ -250,6 +250,7 @@ export const arrayConfigs = [
     title: 'Project Bulk Upload',
     enabledByDefault: false,
     publicAccess: true,
+    rules: [AlwaysEnabledInTestEnvRule],
   },
 ];
 
