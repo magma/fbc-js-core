@@ -248,7 +248,8 @@ export const arrayConfigs = [
   {
     id: 'projects_bulk_upload',
     title: 'Project Bulk Upload',
-    enabledByDefault: true,
+    enabledByDefault: false,
+    publicAccess: true,
   },
 ];
 
