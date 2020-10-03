@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/express-middleware",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "@fbcnms/logging": "^0.1.0",
     "body-parser": "^1.18.3",

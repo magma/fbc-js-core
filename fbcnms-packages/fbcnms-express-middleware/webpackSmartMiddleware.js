@@ -33,6 +33,7 @@ function webpackDevMiddleware(options: WebpackMiddlewareOptions): Middleware {
   const middleware = webpackMiddleware(compiler, {
     publicPath: devWebpackConfig.output.publicPath,
     contentBase: 'src',
+    watchOptions: devWebpackConfig?.devServer?.watchOptions,
     logger,
     stats: {
       colors: true,
