@@ -6,8 +6,8 @@
   "version": "0.1.13",
   "repository": {
     "type": "git",
-    "url": "https://github.com/facebookincubator/magma.git",
-    "directory": "nms/fbcnms-packages/fbcnms-alarms"
+    "url": "https://github.com/facebookincubator/fbc-js-core.git",
+    "directory": "fbcnms-packages/fbcnms-alarms"
   },
   "main": "lib/index.js",
   "scripts": {
