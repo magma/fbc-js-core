@@ -42,7 +42,9 @@ export function joinNullableStrings(
   strings: Array<?string>,
   separator?: ?string,
 ): string {
-  return strings
-    .filter(str => str != null && str != '')
-    .join(separator ?? undefined);
+  const tooltipStrings = strings.filter(str => str != null);
+  if (tooltipStrings.length === 0) {
+    return undefined;
+  }
+  return tooltipStrings.filter(str => str != '').join(separator ?? undefined);
 }
