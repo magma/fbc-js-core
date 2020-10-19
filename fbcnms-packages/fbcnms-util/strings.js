@@ -41,7 +41,7 @@ export function capitalize(s: string) {
 export function joinNullableStrings(
   strings: Array<?string>,
   separator?: ?string,
-): string {
+): ?string {
   const tooltipStrings = strings.filter(str => str != null);
   if (tooltipStrings.length === 0) {
     return undefined;
