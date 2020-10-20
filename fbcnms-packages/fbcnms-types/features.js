@@ -15,7 +15,6 @@ export type FeatureID =
   | 'audit_log_view'
   | 'third_party_devices'
   | 'network_topology'
-  | 'site_survey'
   | 'alerts'
   | 'alert_receivers'
   | 'alert_routes'

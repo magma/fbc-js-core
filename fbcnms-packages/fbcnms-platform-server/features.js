@@ -87,12 +87,6 @@ export const arrayConfigs = [
     enabledByDefault: true,
   },
   {
-    id: 'site_survey',
-    title: 'Site Survey',
-    enabledByDefault: false,
-    rules: [AlwaysEnabledInTestEnvRule],
-  },
-  {
     id: 'alerts',
     title: 'Alerts',
     enabledByDefault: true,
