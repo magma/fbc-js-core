@@ -219,11 +219,6 @@ export const arrayConfigs = [
     publicAccess: true,
   },
   {
-    id: 'async_export',
-    title: 'Asynchronous location export',
-    enabledByDefault: false,
-  },
-  {
     id: 'add_port_to_service',
     title: 'Add standalone port to service',
     enabledByDefault: false,
