@@ -40,7 +40,6 @@ export type FeatureID =
   | 'dashboard_v2'
   | 'work_order_activities_display'
   | 'mandatory_properties_on_work_order_close'
-  | 'async_export'
   | 'add_port_to_service'
   | 'execute_automation_flows'
   | 'workorder_new_status'
