@@ -42,6 +42,5 @@ export type FeatureID =
   | 'mandatory_properties_on_work_order_close'
   | 'add_port_to_service'
   | 'execute_automation_flows'
-  | 'workorder_new_status'
   | 'projects_bulk_upload'
   | 'enable_backplane_connections';

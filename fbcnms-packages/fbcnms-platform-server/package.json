@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/platform-server",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "dependencies": {
     "@fbcnms/auth": "^0.1.0",
     "@fbcnms/babel-register": "^0.1.0",
@@ -8,7 +8,7 @@
     "@fbcnms/logging": "^0.1.0",
     "@fbcnms/magma-api": "^0.1.0",
     "@fbcnms/sequelize-models": "^0.1.0",
-    "@fbcnms/types": "^0.1.9",
+    "@fbcnms/types": "^0.1.10",
     "@fbcnms/util": "^0.1.0",
     "add": "^2.0.6",
     "axios": "^0.18.0",

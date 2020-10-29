@@ -230,11 +230,6 @@ export const arrayConfigs = [
     rules: [AlwaysEnabledInTestEnvRule],
   },
   {
-    id: 'workorder_new_status',
-    title: 'Work Order New Status',
-    enabledByDefault: false,
-  },
-  {
     id: 'projects_bulk_upload',
     title: 'Project Bulk Upload',
     enabledByDefault: false,
