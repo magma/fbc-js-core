@@ -241,6 +241,11 @@ export const arrayConfigs = [
     title: 'Enable Backplane Connections',
     enabledByDefault: false,
   },
+  {
+    id: 'projects_column_selector',
+    id: 'Projects Column Selector',
+    enabledByDefault: false,
+  },
 ];
 
 export const featureConfigs: {[FeatureID]: FeatureConfig} = {};
