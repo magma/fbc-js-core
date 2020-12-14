@@ -84,9 +84,13 @@ jobs:
           working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
       - run:
+          name: yarn install
+          working_directory: fbcnms-packages/<<parameters.package_dir>>
+          command: yarn install
+      - run:
           name: npm publish
           working_directory: fbcnms-packages/<<parameters.package_dir>>
-          command: npm publish --access public   
+          command: npm publish --access public
 
 workflows:
   version: 2.1
