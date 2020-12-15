@@ -243,7 +243,7 @@ export const arrayConfigs = [
   },
   {
     id: 'projects_column_selector',
-    id: 'Projects Column Selector',
+    title: 'Projects Column Selector',
     enabledByDefault: false,
   },
 ];
