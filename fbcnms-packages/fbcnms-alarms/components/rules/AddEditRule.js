@@ -10,7 +10,7 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import RuleContext from './RuleContext';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useState} from 'react';
 

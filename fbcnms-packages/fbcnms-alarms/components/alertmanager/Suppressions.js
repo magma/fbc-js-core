@@ -15,7 +15,7 @@ import React from 'react';
 import SimpleTable, {toLabels} from '../table/SimpleTable';
 import TableActionDialog from '../table/TableActionDialog';
 import useRouter from '../../hooks/useRouter';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
 import {useState} from 'react';

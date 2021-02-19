@@ -22,7 +22,7 @@ import TextField from '@material-ui/core/TextField';
 import useRouter from '../../../hooks/useRouter';
 import {LABEL_OPERATORS} from '../../prometheus/PromQLTypes';
 import {groupBy} from 'lodash';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../../AlarmContext';
 import {useEnqueueSnackbar} from '../../../hooks/useSnackbar';
 
