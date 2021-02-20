@@ -19,7 +19,7 @@ import TableAddButton from './table/TableAddButton';
 import axios from 'axios';
 import useRouter from '../hooks/useRouter';
 import {Parse} from './prometheus/PromQLParser';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from './AlarmContext';
 import {useEnqueueSnackbar} from '../hooks/useSnackbar';
 import {useLoadRules} from './hooks';

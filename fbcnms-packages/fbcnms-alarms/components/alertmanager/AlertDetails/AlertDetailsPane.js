@@ -27,7 +27,7 @@ import Paper from '@material-ui/core/Paper';
 import SeverityIndicator from '../../severity/SeverityIndicator';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../../AlarmContext';
 
 import type {

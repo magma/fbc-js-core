@@ -21,7 +21,7 @@ import SimpleTable from '../../table/SimpleTable';
 import TableActionDialog from '../../table/TableActionDialog';
 import TableAddButton from '../../table/TableAddButton';
 import useRouter from '../../../hooks/useRouter';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../../AlarmContext';
 import {useEnqueueSnackbar} from '../../../hooks/useSnackbar';
 import type {AlertReceiver} from '../../AlarmAPIType';

@@ -25,7 +25,7 @@ import Typography from '@material-ui/core/Typography';
 import getPrometheusRuleInterface from './rules/PrometheusEditor/getRuleInterface';
 import useRouter from '../hooks/useRouter';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {matchPath} from 'react-router';
 
 import type {ApiUtil} from './AlarmsApi';

@@ -22,7 +22,7 @@ import useRouter from '../../hooks/useRouter';
 import {Link} from 'react-router-dom';
 import {SEVERITY} from '../severity/Severity';
 import {get} from 'lodash';
-import {makeStyles} from '@material-ui/styles';
+import {makeStyles} from '@material-ui/core/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useEffect, useState} from 'react';
 import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
