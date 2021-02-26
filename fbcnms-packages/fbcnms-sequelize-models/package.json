@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/sequelize-models",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "sequelize": "^5.8.5"
   }

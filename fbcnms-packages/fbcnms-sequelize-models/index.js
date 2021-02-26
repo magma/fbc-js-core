@@ -47,6 +47,14 @@ export function jsonArrayContains(column: string, value: string) {
     sequelize.getDialect() === 'mariadb'
   ) {
     return Sequelize.fn('JSON_CONTAINS', Sequelize.col(column), `"${value}"`);
+  } else if (sequelize.getDialect() === 'postgres') {
+    const escapedColumn = sequelize
+      .getQueryInterface()
+      .quoteIdentifier(column, true);
+    const escapedValue = sequelize
+      .getQueryInterface()
+      .quoteIdentifier(value, true);
+    return Sequelize.literal(`${escapedColumn}::jsonb @> '${escapedValue}'`);
   } else {
     // sqlite
     const escapedColumn = sequelize
