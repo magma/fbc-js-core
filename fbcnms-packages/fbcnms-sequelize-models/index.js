@@ -8,6 +8,8 @@
  * @format
  */
 
+import type {Options} from 'sequelize';
+
 import AuditLogEntryModel from './models/audit_log_entry';
 import FeatureFlagModel from './models/featureflag';
 import OrganizationModel from './models/organization';
@@ -25,16 +27,21 @@ export const sequelize = new Sequelize(
   config,
 );
 
-const db = {
-  AuditLogEntry: AuditLogEntryModel(sequelize, Sequelize),
-  FeatureFlag: FeatureFlagModel(sequelize, Sequelize),
-  Organization: OrganizationModel(sequelize, Sequelize),
-  User: UserModel(sequelize, Sequelize),
-};
+const db = createNmsDb(sequelize);
 
-Object.keys(db).forEach(
-  modelName => db[modelName].associate != null && db[modelName].associate(db),
-);
+function createNmsDb(sequelize: Sequelize) {
+  const db = {
+    AuditLogEntry: AuditLogEntryModel(sequelize, Sequelize),
+    FeatureFlag: FeatureFlagModel(sequelize, Sequelize),
+    Organization: OrganizationModel(sequelize, Sequelize),
+    User: UserModel(sequelize, Sequelize),
+  };
+
+  Object.keys(db).forEach(
+    modelName => db[modelName].associate != null && db[modelName].associate(db),
+  );
+  return db;
+}
 
 export const AuditLogEntry = db.AuditLogEntry;
 export const Organization = db.Organization;
@@ -66,4 +73,35 @@ export function jsonArrayContains(column: string, value: string) {
     );
     return Sequelize.where(innerQuery, 'IS', Sequelize.literal('NOT NULL'));
   }
+}
+
+export async function importFromDatabase(sourceConfig: Options) {
+  const sourceSequelize = new Sequelize(
+    sourceConfig.database || '',
+    sourceConfig.username,
+    sourceConfig.password,
+    sourceConfig,
+  );
+  const sourceDb = createNmsDb(sourceSequelize);
+
+  // $FlowIgnore findAll function exists for AuditLogEntry
+  const auditLogEntries = await sourceDb.AuditLogEntry.findAll();
+  await AuditLogEntry.bulkCreate(getDataValues(auditLogEntries));
+
+  // $FlowIgnore findAll function exists for FeatureFlag
+  const featureFlags = await sourceDb.FeatureFlag.findAll();
+  await FeatureFlag.bulkCreate(getDataValues(featureFlags));
+
+  // $FlowIgnore findAll function exists for Organization
+  const organization = await sourceDb.Organization.findAll();
+  await Organization.bulkCreate(getDataValues(organization));
+
+  // $FlowIgnore findAll function exists for User
+  const user = await sourceDb.User.findAll();
+  await User.bulkCreate(getDataValues(user));
+}
+
+// eslint-disable-next-line flowtype/no-weak-types
+function getDataValues(sequelizeModels: Array<Object>): Array<Object> {
+  return sequelizeModels.map(model => model.dataValues);
 }
