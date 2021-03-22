@@ -71,7 +71,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Halt on no changes 
+          name: Halt on no changes
           working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: |
             published=$(npm -s show <<parameters.package_name>> version || exit 0)
