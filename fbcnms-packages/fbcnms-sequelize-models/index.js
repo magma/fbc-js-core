@@ -101,6 +101,32 @@ export async function importFromDatabase(sourceConfig: Options) {
   await User.bulkCreate(getDataValues(user));
 }
 
+export async function exportToDatabase(targetConfig: Options) {
+  const targetSequelize = new Sequelize(
+    targetConfig.database || '',
+    targetConfig.username,
+    targetConfig.password,
+    targetConfig,
+  );
+  const targetDb = createNmsDb(targetSequelize);
+
+  // $FlowIgnore findAll function exists for AuditLogEntry
+  const auditLogEntries = await AuditLogEntry.findAll();
+  await targetDb.AuditLogEntry.bulkCreate(getDataValues(auditLogEntries));
+
+  // $FlowIgnore findAll function exists for FeatureFlag
+  const featureFlags = await FeatureFlag.findAll();
+  await targetDb.FeatureFlag.bulkCreate(getDataValues(featureFlags));
+
+  // $FlowIgnore findAll function exists for Organization
+  const organization = await Organization.findAll();
+  await targetDb.Organization.bulkCreate(getDataValues(organization));
+
+  // $FlowIgnore findAll function exists for User
+  const user = await User.findAll();
+  await targetDb.User.bulkCreate(getDataValues(user));
+}
+
 // eslint-disable-next-line flowtype/no-weak-types
 function getDataValues(sequelizeModels: Array<Object>): Array<Object> {
   return sequelizeModels.map(model => model.dataValues);

@@ -16,37 +16,38 @@
  * After a successful run of this script, both the source and target
  * data should exist on the target database.
  *
- * While the source DB connection options must be specified,
- * the target DB connection is established automatically using
- * environment variables.
+ * One DB connection is established automatically using environment
+ * variables. The other DB connection must be specified by the user.
  *
  *
- * Script arguments (specifies source DB only):
+ * Script arguments:
  * --username:          DB username
  * --password:          DB password
  * --host:              DB host
  * --port:              DB port
  * --dialect:           DB SQL dialect
- * --confirm: skip final confirmation to run migration
+ * --export:            export from default sequelize DB
+ * --confirm:           skip final confirmation to run migration
  *
  * Example Usage:
  *  $ node -r @fbcnms/babel-register main.js
- *  ? Enter Source DB host: mariadb
- *  ? Enter Source DB port: 3306
- *  ? Enter Source DB database name: nms
- *  ? Enter Source DB username: root
- *  ? Enter Source DB password: [hidden]
- *  ? Enter Source DB SQL dialect: mariadb
+ *  ? Enter DB host: mariadb
+ *  ? Enter DB port: 3306
+ *  ? Enter DB database name: nms
+ *  ? Enter DB username: root
+ *  ? Enter DB password: [hidden]
+ *  ? Enter DB SQL dialect: mariadb
  *
- *  Source DB Connection Config:
+ *  DB Connection Config:
  *  ---------------------------
  *  Host: mariadb:3306
  *  Database: nms
  *  Username: root
  *  Dialect: mariadb
  *
+ *  ? Are you importing from the specified DB, or exporting to it?: import
  *  ? Would you like to run data migration with these settings?: Yes
- *  Completed data migration to target DB
+ *  Completed data migration, importing from specified DB
  */
 
 /* eslint no-console: "off" */
@@ -54,7 +55,7 @@
 const inquirer = require('inquirer');
 const process = require('process');
 const argv = require('minimist')(process.argv.slice(2));
-const {importFromDatabase} = require('./index');
+const {exportToDatabase, importFromDatabase} = require('./index');
 import {User} from './index';
 import type {Options} from 'sequelize';
 
@@ -62,36 +63,36 @@ const dbQuestions = [
   {
     type: 'input',
     name: 'host',
-    message: 'Enter Source DB host:',
+    message: 'Enter DB host:',
     default: 'mariadb',
   },
   {
     type: 'input',
     name: 'port',
-    message: 'Enter Source DB port:',
+    message: 'Enter DB port:',
     default: 3306,
   },
   {
     type: 'input',
     name: 'database',
-    message: 'Enter Source DB database name:',
+    message: 'Enter DB database name:',
     default: 'nms',
   },
   {
     type: 'input',
     name: 'username',
-    message: 'Enter Source DB username:',
+    message: 'Enter DB username:',
     default: 'root',
   },
   {
     type: 'password',
     name: 'password',
-    message: 'Enter Source DB password:',
+    message: 'Enter DB password:',
   },
   {
     type: 'input',
     name: 'dialect',
-    message: 'Enter Source DB SQL dialect:',
+    message: 'Enter DB SQL dialect:',
     default: 'mariadb',
   },
 ];
@@ -156,7 +157,7 @@ async function getDbOptions(): Promise<Options> {
 function displayDbOptions(dbOptions: Options) {
   const notice =
     `\n` +
-    `Source DB Connection Config:\n` +
+    `DB Connection Config:\n` +
     `---------------------------\n` +
     `Host: ${dbOptions.host || ''}:${dbOptions.port || 0} \n` +
     `Database: ${dbOptions.database || ''} \n` +
@@ -168,22 +169,34 @@ function displayDbOptions(dbOptions: Options) {
 
 async function confirmAndRunMigration(dbOptions: Options): Promise<void> {
   if (argv['confirm']) {
-    await runMigration(dbOptions);
+    if (argv['export']) {
+      await runMigration(false, dbOptions);
+      return;
+    }
+    await runMigration(true, dbOptions);
     return;
   }
 
   await inquirer
     .prompt([
       {
+        type: 'rawlist',
+        name: 'runType',
+        message:
+          'Are you importing from the specified DB, or exporting to it?:',
+        choices: ['import', 'export'],
+      },
+      {
         type: 'confirm',
         name: 'willRun',
         message: 'Would you like to run data migration with these settings?:',
       },
     ])
-    .then(confirmation => {
-      if (confirmation['willRun']) {
+    .then(answers => {
+      if (answers['willRun']) {
+        const isImport = answers['runType'] === 'import';
         (async () => {
-          await runMigration(dbOptions);
+          await runMigration(isImport, dbOptions);
         })();
         return;
       }
@@ -191,13 +204,21 @@ async function confirmAndRunMigration(dbOptions: Options): Promise<void> {
     });
 }
 
-async function runMigration(dbOptions: Options): Promise<void> {
+async function runMigration(
+  isImport: boolean,
+  dbOptions: Options,
+): Promise<void> {
   try {
-    await importFromDatabase(dbOptions);
-    console.log('Completed data migration to target DB');
+    if (isImport) {
+      await importFromDatabase(dbOptions);
+      console.log('Completed data migration, importing from specified DB');
+    } else {
+      await exportToDatabase(dbOptions);
+      console.log('Completed data migration, exporting to specified DB');
+    }
   } catch (error) {
     console.log(
-      `Unable to connect to source database for migration:\n` +
+      `Unable to connect to specified database for migration:\n` +
         `--------------------------------------------------------------------------\n` +
         `${error}\n` +
         `--------------------------------------------------------------------------\n`,
@@ -210,7 +231,7 @@ function main() {
   (async () => {
     const willRunMigration = await isMigrationNeeded();
     if (!willRunMigration) {
-      console.log('Skipping migration from source DB');
+      console.log('Skipping DB migration');
       return;
     }
 
