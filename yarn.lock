@@ -1474,6 +1474,17 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
+"@fbcnms/sequelize-models@^0.1.1":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@fbcnms/sequelize-models/-/sequelize-models-0.1.4.tgz#72d921fcd53981059d83209d7bcc6687f74e87aa"
+  integrity sha512-G3xzFb4jHbeRICGo0o4f379DYVM+SwZnxCnA0fp47d5KlrZHAuJdejMnVJ3P+EebXYK+WXmfisQKqiB8t1XK4g==
+  dependencies:
+    "@fbcnms/babel-register" "^0.1.0"
+    inquirer "^8.0.0"
+    mariadb "^2.4.2"
+    minimist "^1.2.5"
+    sequelize "^5.8.5"
+
 "@icons/material@^0.2.4":
   version "0.2.4"
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"

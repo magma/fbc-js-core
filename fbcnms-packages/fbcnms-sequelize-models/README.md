@@ -1,8 +1,54 @@
 # fbcnms-sequelize-models
 
-## dbDataMigration Usage
+A NMS-specific wrapper around the [Sequelize ORM](https://sequelize.org/).
 
-Used for migration of sequelize-models data from one DB to another
+Sequelize-models includes pre-defined models for common NMS entities such as organizations,
+users, feature flags, and even audit log entries.
+
+---
+
+## Usage
+
+Sequelize-models uses the DB specified by the following environment variables:
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USER`
+- `DB_PASS`
+- `DB_NAME`
+- `DB_DIALECT`
+
+
+**Organization Usage**
+```
+import {Organization} from '@fbcnms/sequelize-models';
+
+async function findOrganization(orgName) {
+  const org = await Organization.findOne({
+    where: {
+      name: orgName,
+    },
+  });
+  return org;
+}
+
+async createDefaultOrganization() {
+  await Organization.create({
+    name: organization,
+    tab: ['inventory', 'nms'],
+    networkIDs: [],
+    csvCharset: '',
+    ssoCert: '',
+    ssoIssuer: '',
+    ssoEntrypoint: '',
+  });
+}
+```
+
+---
+
+## DB Data Migration Usage
+
+Functionality is also provided if you need to migrate your data between databases.
 
 **Example: Manual Usage**
 ```
