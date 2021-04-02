@@ -1,8 +1,8 @@
 {
   "name": "@fbcnms/sequelize-models",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
-    "dbDataMigrate": "node -r @fbcnms/babel-register dbDataMigration.js"
+    "dbDataMigrate": "node -r @fbcnms/babel-register db-migration/migrate.js"
 },
   "dependencies": {
     "@fbcnms/babel-register": "^0.1.0",
