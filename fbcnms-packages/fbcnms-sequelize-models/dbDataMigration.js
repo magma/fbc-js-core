@@ -56,7 +56,6 @@ const inquirer = require('inquirer');
 const process = require('process');
 const argv = require('minimist')(process.argv.slice(2));
 const {exportToDatabase, importFromDatabase} = require('./index');
-import {User} from './index';
 import type {Options} from 'sequelize';
 
 const dbQuestions = [
@@ -96,26 +95,6 @@ const dbQuestions = [
     default: 'mariadb',
   },
 ];
-
-async function isMigrationNeeded(): Promise<boolean> {
-  try {
-    const allUsers = await User.findAll();
-    if (allUsers.length > 0) {
-      console.warn('Users found in target DB. Migration may already have run');
-      return await false;
-    }
-    return await true;
-  } catch (e) {
-    console.error(
-      `Unable to run migration. Connection error to target database: \n` +
-        `------------------------\n` +
-        `${e} \n` +
-        `------------------------\n`,
-    );
-    process.exit(1);
-  }
-  return await false;
-}
 
 async function getDbOptions(): Promise<Options> {
   let dbOptions: Options = {};
@@ -211,10 +190,10 @@ async function runMigration(
   try {
     if (isImport) {
       await importFromDatabase(dbOptions);
-      console.log('Completed data migration, importing from specified DB');
+      console.log('Completed data migration, imported from specified DB');
     } else {
       await exportToDatabase(dbOptions);
-      console.log('Completed data migration, exporting to specified DB');
+      console.log('Completed data migration, exported to specified DB');
     }
   } catch (error) {
     console.log(
@@ -229,15 +208,8 @@ async function runMigration(
 
 function main() {
   (async () => {
-    const willRunMigration = await isMigrationNeeded();
-    if (!willRunMigration) {
-      console.log('Skipping DB migration');
-      return;
-    }
-
     const dbOptions: Options = await getDbOptions();
     displayDbOptions(dbOptions);
-
     await confirmAndRunMigration(dbOptions);
   })();
 }
