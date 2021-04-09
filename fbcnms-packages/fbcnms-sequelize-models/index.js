@@ -116,6 +116,8 @@ export async function importFromDatabase(sourceConfig: Options) {
     return;
   }
 
+  await migrateMeta(sourceSequelize, sequelize);
+
   // $FlowIgnore findAll function exists for AuditLogEntry
   const auditLogEntries = await sourceDb.AuditLogEntry.findAll();
   await AuditLogEntry.bulkCreate(getDataValues(auditLogEntries));
@@ -160,6 +162,8 @@ export async function exportToDatabase(targetConfig: Options) {
     return;
   }
 
+  await migrateMeta(sequelize, targetSequelize);
+
   // $FlowIgnore findAll function exists for AuditLogEntry
   const auditLogEntries = await AuditLogEntry.findAll();
   await targetDb.AuditLogEntry.bulkCreate(getDataValues(auditLogEntries));
@@ -182,6 +186,25 @@ export async function exportToDatabase(targetConfig: Options) {
     user.tabs = user.tabs || [];
   });
   await targetDb.User.bulkCreate(getDataValues(users));
+}
+
+async function migrateMeta(source: Sequelize, target: Sequelize) {
+  // Read in the current SequelizeMeta data
+  const rows = await sequelize.query('SELECT * FROM `SequelizeMeta`', {
+    type: source.QueryTypes.SELECT,
+  });
+
+  // Write SequelizeMeta data
+  const targetInterface = target.getQueryInterface();
+  await targetInterface.createTable('SequelizeMeta', {
+    name: {
+      type: Sequelize.STRING,
+      allowNull: false,
+      unique: true,
+      primaryKey: true,
+    },
+  });
+  await targetInterface.bulkInsert('SequelizeMeta', rows);
 }
 
 // eslint-disable-next-line flowtype/no-weak-types
