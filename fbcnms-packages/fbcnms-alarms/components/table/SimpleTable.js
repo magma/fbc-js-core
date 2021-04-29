@@ -11,7 +11,7 @@
 import * as React from 'react';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
-import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
 import Paper from '@material-ui/core/Paper';
 import SeverityIndicator from '../severity/SeverityIndicator';
 import Table from '@material-ui/core/Table';
@@ -19,7 +19,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {withStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -29,9 +29,6 @@ const useStyles = makeStyles(theme => ({
     margin: '5px',
   },
   titleCell: {
-    color: theme.palette.black,
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: 400,
     marginBottom: 2,
   },
   secondaryCell: {
@@ -358,13 +355,12 @@ export default function SimpleTable<T>(props: Props<T>) {
         {onActionsClick && (
           <BodyTableCell>
             <Button
-              variant="outlined"
               onClick={event => {
                 event.stopPropagation();
                 onActionsClick(row, event.target);
               }}
               aria-label="Action Menu">
-              <MoreHorizIcon color="action" />
+              <MoreVertIcon color="action" />
             </Button>
           </BodyTableCell>
         )}

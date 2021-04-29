@@ -21,7 +21,7 @@ import type {
 import type {CancelToken} from 'axios';
 
 export type ApiRequest = {
-  networkId?: string,
+  networkId: string,
   cancelToken?: CancelToken,
 };
 
@@ -66,8 +66,10 @@ export type ApiUtil = {|
   getRouteTree: (req: ApiRequest) => Promise<AlertRoutingTree>,
   editRouteTree: (req: {route: AlertRoutingTree} & ApiRequest) => Promise<void>,
 
-  // metric series
-  getMetricSeries: (req: ApiRequest) => Promise<Array<PrometheusLabelset>>,
+  getMetricNames: (req: ApiRequest) => Promise<Array<string>>,
+  getMetricSeries: (
+    req: {name: string} & ApiRequest,
+  ) => Promise<Array<PrometheusLabelset>>,
 
   //alertmanager global config
   getGlobalConfig: (req: ApiRequest) => Promise<AlertManagerGlobalConfig>,

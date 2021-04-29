@@ -27,7 +27,7 @@ import Paper from '@material-ui/core/Paper';
 import SeverityIndicator from '../../severity/SeverityIndicator';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
 
 import type {
@@ -36,6 +36,7 @@ import type {
 } from '../../rules/RuleInterface';
 import type {FiringAlarm} from '../../AlarmAPIType';
 import type {Labels} from '../../AlarmAPIType';
+import type {SvgIconProps} from '@material-ui/core/@@SvgIcon';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -191,20 +192,27 @@ export function Section({
   );
 }
 
+const useDetailIconStyles = makeStyles(_theme => ({
+  root: {
+    verticalAlign: 'middle',
+    fontSize: '1rem',
+  },
+}));
 // layout for items in the Details section
 export function Detail({
   icon: Icon,
   title,
   children,
 }: {
-  icon: React.ComponentType<*>,
+  icon: React.ComponentType<SvgIconProps>,
   title: string,
   children: React.Node,
 }) {
+  const iconStyles = useDetailIconStyles();
   return (
     <Grid item container wrap="nowrap" spacing={1}>
       <Grid item>
-        <Icon fontSize="small" />
+        <Icon classes={iconStyles} fontSize="small" />
       </Grid>
       <Grid container direction="column" item>
         <Grid item>

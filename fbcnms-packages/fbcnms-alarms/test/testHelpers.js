@@ -58,6 +58,7 @@ export function mockApiUtil(merge?: $Shape<ApiUtil>): ApiUtil {
       getRouteTree: jest.fn(),
       editRouteTree: jest.fn(),
       getSuppressions: jest.fn(),
+      getMetricNames: jest.fn(),
       getMetricSeries: jest.fn(),
       getGlobalConfig: jest.fn(),
       editGlobalConfig: jest.fn(),

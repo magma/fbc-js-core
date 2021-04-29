@@ -8,18 +8,13 @@
  * @format
  */
 
-import 'jest-dom/extend-expect';
-import {cleanup} from '@testing-library/react';
 import {act as hooksAct, renderHook} from '@testing-library/react-hooks';
 import {mockRuleInterface} from '../../test/testData';
 import {useLoadRules} from '../hooks';
 import type {GenericRule} from '../rules/RuleInterface';
+import type {RenderResult} from '@testing-library/react-hooks';
 
 jest.useFakeTimers();
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
 
 const enqueueSnackbarMock = jest.fn();
 jest
@@ -104,10 +99,15 @@ function mockRule(): GenericRule<{}> {
   };
 }
 
-async function renderHookAsync(renderFn): any {
-  let response;
+async function renderHookAsync<TProps, TResult>(
+  renderFn: TProps => TResult,
+): Promise<RenderResult<TResult>> {
+  let response: ?RenderResult<TResult>;
   await hooksAct(async () => {
-    response = await renderHook(renderFn);
+    response = await renderHook<TProps, TResult>(renderFn);
   });
+  if (response == null) {
+    throw new Error('render failed');
+  }
   return response;
 }

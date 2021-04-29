@@ -8,24 +8,23 @@
  * @format
  */
 
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AlarmContext from './AlarmContext';
 import AlertRules from './AlertRules';
 import FiringAlerts from './alertmanager/FiringAlerts';
 import Grid from '@material-ui/core/Grid';
-import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
-import ListOutlinedIcon from '@material-ui/icons/ListOutlined';
-import NotificationsActiveOutlinedIcon from '@material-ui/icons/NotificationsActiveOutlined';
+import GroupIcon from '@material-ui/icons/Group';
+import NotificationsActiveIcon from '@material-ui/icons/NotificationsActive';
 import React from 'react';
 import Receivers from './alertmanager/Receivers/Receivers';
 import Routes from './alertmanager/Routes';
 import Suppressions from './alertmanager/Suppressions';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
-import Typography from '@material-ui/core/Typography';
 import getPrometheusRuleInterface from './rules/PrometheusEditor/getRuleInterface';
 import useRouter from '../hooks/useRouter';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {matchPath} from 'react-router';
 
 import type {ApiUtil} from './AlarmsApi';
@@ -35,9 +34,17 @@ import type {Labels} from './AlarmAPIType';
 import type {Match} from 'react-router-dom';
 import type {RuleInterfaceMap} from './rules/RuleInterface';
 
-const useStyles = makeStyles(_ => ({
-  tab: {
+const useTabStyles = makeStyles(theme => ({
+  root: {
     minWidth: 'auto',
+    minHeight: theme.spacing(4),
+  },
+  wrapper: {
+    flexDirection: 'row',
+    textTransform: 'capitalize',
+    '& svg, .material-icons': {
+      marginRight: theme.spacing(1),
+    },
   },
 }));
 
@@ -53,11 +60,11 @@ type TabMap = {
 const TABS: TabMap = {
   alerts: {
     name: 'Alerts',
-    icon: <NotificationsActiveOutlinedIcon />,
+    icon: <NotificationsActiveIcon />,
   },
   rules: {
     name: 'Rules',
-    icon: <ListOutlinedIcon />,
+    icon: <AccountTreeIcon />,
   },
   suppressions: {
     name: 'Suppressions',
@@ -69,7 +76,7 @@ const TABS: TabMap = {
   },
   teams: {
     name: 'Teams',
-    icon: <GroupOutlinedIcon />,
+    icon: <GroupIcon />,
   },
 };
 
@@ -99,7 +106,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
     ruleMap,
     getAlertType,
   } = props;
-  const classes = useStyles();
+  const tabStyles = useTabStyles();
   const {match, location} = useRouter();
 
   const currentTabMatch = matchPath(location.pathname, {
@@ -122,13 +129,6 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
         getAlertType: getAlertType,
       }}>
       <Grid container spacing={2} justify="space-between">
-        <Grid item xs={10}>
-          <Typography variant="h6">
-            {`Current ${
-              currentTabMatch?.params?.tabName || DEFAULT_TAB_NAME
-            }`.toUpperCase()}
-          </Typography>
-        </Grid>
         <Grid item xs={3}>
           <Tabs
             value={currentTabMatch?.params?.tabName || DEFAULT_TAB_NAME}
@@ -141,7 +141,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
               const {icon, name} = TABS[keyName];
               return (
                 <Tab
-                  className={classes.tab}
+                  classes={tabStyles}
                   component={Link}
                   to={makeTabLink({keyName, match})}
                   key={keyName}

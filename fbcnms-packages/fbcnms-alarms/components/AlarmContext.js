@@ -54,6 +54,7 @@ const emptyApiUtil = {
   deleteReceiver: (..._) => Promise.reject('not implemented'),
   getRouteTree: (..._) => Promise.reject('not implemented'),
   editRouteTree: (..._) => Promise.reject('not implemented'),
+  getMetricNames: (..._) => Promise.reject('not implemented'),
   getMetricSeries: (..._) => Promise.reject('not implemented'),
   getGlobalConfig: _ => Promise.reject('not implemented'),
   editGlobalConfig: _ => Promise.reject('not implemented'),

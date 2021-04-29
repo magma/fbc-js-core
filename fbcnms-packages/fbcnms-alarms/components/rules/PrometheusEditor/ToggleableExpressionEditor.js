@@ -10,7 +10,7 @@
 
 import * as PromQL from '../../prometheus/PromQL';
 import * as React from 'react';
-import Attachment from '@material-ui/icons/Attachment';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
@@ -19,19 +19,14 @@ import MenuItem from '@material-ui/core/MenuItem';
 import RemoveCircleIcon from '@material-ui/icons/RemoveCircle';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
-import useRouter from '../../../hooks/useRouter';
 import {LABEL_OPERATORS} from '../../prometheus/PromQLTypes';
-import {groupBy} from 'lodash';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
-import {useEnqueueSnackbar} from '../../../hooks/useSnackbar';
+import {useNetworkId} from '../../../components/hooks';
+import {useSnackbars} from '../../../hooks/useSnackbar';
 
 import type {BinaryComparator} from '../../prometheus/PromQLTypes';
 import type {InputChangeFunc} from './PrometheusEditor';
-
-type prometheus_labelset = {
-  [string]: string,
-};
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -60,6 +55,8 @@ export type ThresholdExpression = {
   value: number,
 };
 
+type LabelValuesLookup = Map<string, Set<string>>;
+
 export function thresholdToPromQL(
   thresholdExpression: ThresholdExpression,
 ): string {
@@ -85,24 +82,22 @@ export default function ToggleableExpressionEditor(props: {
   onToggleChange: void => void,
 }) {
   const {apiUtil} = useAlarmContext();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
-  const {response, error} = apiUtil.useAlarmsApi(apiUtil.getMetricSeries, {
-    networkId: match.params.networkId,
+  const snackbars = useSnackbars();
+  const networkId = useNetworkId();
+  const {response, error} = apiUtil.useAlarmsApi(apiUtil.getMetricNames, {
+    networkId,
   });
+
   if (error) {
-    enqueueSnackbar('Error retrieving metrics: ' + error, {
-      variant: 'error',
-    });
+    snackbars.error('Error retrieving metrics: ' + error);
   }
-  const metricsByName = groupBy(response, '__name__');
 
   return (
     <Grid container item xs={12}>
       <ThresholdExpressionEditor
         onChange={props.onThresholdExpressionChange}
         expression={props.expression}
-        metricsByName={metricsByName}
+        metricNames={response ?? []}
         onToggleChange={props.onToggleChange}
       />
     </Grid>
@@ -115,7 +110,7 @@ export function AdvancedExpressionEditor(props: {
 }) {
   return (
     <Grid item>
-      <InputLabel htmlFor="metric-advanced-input">Metric</InputLabel>
+      <InputLabel htmlFor="metric-advanced-input">Label</InputLabel>
       <TextField
         id="metric-advanced-input"
         required
@@ -194,47 +189,72 @@ function ValueSelector(props: {
 function MetricSelector(props: {
   expression: ThresholdExpression,
   onChange: (expression: ThresholdExpression) => void,
-  metricsByName: {[string]: Array<prometheus_labelset>},
+  metricNames: Array<string>,
 }) {
+  const {metricNames} = props;
   return (
     <Grid item>
       <InputLabel htmlFor="metric-input">Metric</InputLabel>
-      <TextField
+      <Autocomplete
         id="metric-input"
-        fullWidth
-        required
-        select
-        value={props.expression.metricName || ''}
-        onChange={({target}) => {
-          props.onChange({...props.expression, metricName: target.value});
-        }}>
-        {getFilteredListOfLabelNames(Object.keys(props.metricsByName)).map(
-          item => (
-            <MenuItem key={item} value={item}>
-              {item}
-            </MenuItem>
-          ),
-        )}
-        {props.metricsByName[props.expression.metricName] ? (
-          ''
-        ) : (
-          <MenuItem
-            key={props.expression.metricName}
-            value={props.expression.metricName}>
-            {props.expression.metricName}
-          </MenuItem>
-        )}
-      </TextField>
+        options={metricNames}
+        groupBy={getMetricNamespace}
+        value={props.expression.metricName}
+        onChange={(_e, value) => {
+          props.onChange({...props.expression, metricName: value});
+        }}
+        renderInput={params => <TextField {...params} required />}
+      />
     </Grid>
   );
 }
 
-function ThresholdExpressionEditor(props: {
+function ThresholdExpressionEditor({
+  expression,
+  onChange,
+  onToggleChange,
+  metricNames,
+}: {
   onChange: (expression: ThresholdExpression) => void,
   expression: ThresholdExpression,
-  metricsByName: {[string]: Array<prometheus_labelset>},
+  metricNames: Array<string>,
   onToggleChange: void => void,
 }) {
+  const networkId = useNetworkId();
+  const {apiUtil} = useAlarmContext();
+  const {metricName} = expression;
+  // mapping from label name to all values in response
+  const [labels, setLabels] = React.useState<LabelValuesLookup>(new Map());
+  // cache all label names
+  const labelNames = React.useMemo<Array<string>>(
+    () => getFilteredListOfLabelNames(Array.from(labels.keys())),
+    [labels],
+  );
+  React.useEffect(() => {
+    async function getMetricLabels() {
+      const response = await apiUtil.getMetricSeries({
+        name: metricName,
+        networkId: networkId,
+      });
+      const labelValues = new Map<string, Set<string>>();
+      for (const metric of response) {
+        for (const labelName of Object.keys(metric)) {
+          let set = labelValues.get(labelName);
+          if (!set) {
+            set = new Set<string>();
+            labelValues.set(labelName, set);
+          }
+          const labelValue = metric[labelName];
+          set.add(labelValue);
+        }
+      }
+      setLabels(labelValues);
+    }
+    if (metricName != null && metricName !== '') {
+      getMetricLabels();
+    }
+  }, [metricName, networkId, setLabels, apiUtil]);
+
   return (
     <Grid item container spacing={1}>
       <Grid
@@ -245,30 +265,25 @@ function ThresholdExpressionEditor(props: {
         justify="space-between">
         <Grid item xs={7}>
           <MetricSelector
-            expression={props.expression}
-            onChange={props.onChange}
-            metricsByName={props.metricsByName}
+            expression={expression}
+            onChange={onChange}
+            metricNames={metricNames}
           />
         </Grid>
         <Grid item xs={3}>
-          <ConditionSelector
-            expression={props.expression}
-            onChange={props.onChange}
-          />
+          <ConditionSelector expression={expression} onChange={onChange} />
         </Grid>
         <Grid item xs={2}>
-          <ValueSelector
-            expression={props.expression}
-            onChange={props.onChange}
-          />
+          <ValueSelector expression={expression} onChange={onChange} />
         </Grid>
       </Grid>
       <Grid item xs={12}>
         <MetricFilters
-          metricsByName={props.metricsByName || {}}
-          expression={props.expression}
-          onChange={props.onChange}
-          onToggleChange={props.onToggleChange}
+          labelNames={labelNames}
+          labelValues={labels}
+          expression={expression}
+          onChange={onChange}
+          onToggleChange={onToggleChange}
         />
       </Grid>
     </Grid>
@@ -276,12 +291,15 @@ function ThresholdExpressionEditor(props: {
 }
 
 function MetricFilters(props: {
-  metricsByName: {[string]: Array<prometheus_labelset>},
+  labelNames: Array<string>,
+  labelValues: LabelValuesLookup,
   expression: ThresholdExpression,
   onChange: (expression: ThresholdExpression) => void,
   onToggleChange: void => void,
 }) {
   const classes = useStyles();
+  const isMetricSelected =
+    props.expression?.metricName != null && props.expression?.metricName !== '';
   return (
     <Grid item container direction="column">
       <Grid item>
@@ -289,6 +307,7 @@ function MetricFilters(props: {
           className={classes.button}
           color="primary"
           size="small"
+          disabled={!isMetricSelected}
           onClick={() => {
             const filtersCopy = props.expression.filters.copy();
             filtersCopy.addEqual('', '');
@@ -297,7 +316,7 @@ function MetricFilters(props: {
               filters: filtersCopy,
             });
           }}>
-          Add new conditional
+          Add new filter
         </Button>
         <Button
           className={classes.button}
@@ -309,10 +328,10 @@ function MetricFilters(props: {
       </Grid>
       <Grid item container direction="column" spacing={3}>
         {props.expression.filters.labels.map((filter, idx) => (
-          <Grid item>
-            <MetricFilter
-              key={idx}
-              metricsByName={props.metricsByName}
+          <Grid item key={idx}>
+            <LabelFilter
+              labelNames={props.labelNames}
+              labelValues={props.labelValues}
               onChange={props.onChange}
               onRemove={filterIdx => {
                 const filtersCopy = props.expression.filters.copy();
@@ -331,8 +350,9 @@ function MetricFilters(props: {
   );
 }
 
-function MetricFilter(props: {
-  metricsByName: {[string]: Array<prometheus_labelset>},
+function LabelFilter(props: {
+  labelNames: Array<string>,
+  labelValues: LabelValuesLookup,
   onChange: (expression: ThresholdExpression) => void,
   onRemove: (filerIdx: number) => void,
   expression: ThresholdExpression,
@@ -341,21 +361,17 @@ function MetricFilter(props: {
   selectedValue: string,
 }) {
   const currentFilter = props.expression.filters.labels[props.filterIdx];
+  const values = Array.from(props.labelValues.get(props.selectedLabel) ?? []);
   return (
-    <Grid item container xs={12} spacing={2} alignItems="flex-end">
-      <Grid item xs={1}>
-        <IconButton disabled>
-          <Attachment />
-        </IconButton>
-      </Grid>
+    <Grid item container xs={12} spacing={1} alignItems="flex-start">
       <Grid item xs={6}>
         <InputLabel htmlFor={'metric-input-' + props.filterIdx}>
-          Metric
+          Label
         </InputLabel>
         <FilterSelector
           id={'metric-input-' + props.filterIdx}
           fullWidth
-          values={getFilteredListOfLabelNames(Object.keys(props.metricsByName))}
+          values={props.labelNames}
           defaultVal=""
           onChange={({target}) => {
             const filtersCopy = props.expression.filters.copy();
@@ -395,22 +411,21 @@ function MetricFilter(props: {
           </TextField>
         </Grid>
       </Grid>
-      <Grid item xs={2}>
+      <Grid item xs={3}>
         <Grid item>
           <InputLabel htmlFor={'value-input-' + props.filterIdx}>
             Value
           </InputLabel>
-          <TextField
-            id={'value-input-' + props.filterIdx}
-            fullWidth
+          <Autocomplete
             value={currentFilter.value}
-            type="number"
-            onChange={({target}) => {
+            freeSolo
+            options={values}
+            onChange={(_e, value) => {
               const filtersCopy = props.expression.filters.copy();
               filtersCopy.setIndex(
                 props.filterIdx,
                 currentFilter.name,
-                target.value,
+                value,
                 currentFilter.operator,
               );
               props.onChange({
@@ -418,11 +433,18 @@ function MetricFilter(props: {
                 filters: filtersCopy,
               });
             }}
+            renderInput={params => (
+              <TextField
+                {...params}
+                required
+                id={'value-input-' + props.filterIdx}
+              />
+            )}
           />
         </Grid>
       </Grid>
-      <Grid item xs={1}>
-        <IconButton onClick={() => props.onRemove(props.filterIdx)}>
+      <Grid item xs={1} container alignItems="center" justify="flex-end">
+        <IconButton onClick={() => props.onRemove(props.filterIdx)} edge="end">
           <RemoveCircleIcon />
         </IconButton>
       </Grid>
@@ -475,4 +497,16 @@ function isRegexValue(value: string): boolean {
     }
   }
   return false;
+}
+
+/**
+ * Gets the first word application prefix of a prometheus metric name. This
+ * is known by most client libraries as a namespace.
+ */
+function getMetricNamespace(option: string) {
+  const index = option.indexOf('_');
+  if (index > -1) {
+    return option.slice(0, index);
+  }
+  return option;
 }

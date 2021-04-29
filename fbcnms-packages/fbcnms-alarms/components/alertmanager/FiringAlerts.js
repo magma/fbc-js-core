@@ -14,18 +14,18 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
-import SimpleTable, {toLabels} from '../table/SimpleTable';
+import SimpleTable from '../table/SimpleTable';
 import Slide from '@material-ui/core/Slide';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
-import useRouter from '../../hooks/useRouter';
 import {Link} from 'react-router-dom';
 import {SEVERITY} from '../severity/Severity';
 import {get} from 'lodash';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useEffect, useState} from 'react';
-import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
+import {useNetworkId} from '../../components/hooks';
+import {useSnackbars} from '../../hooks/useSnackbar';
 
 import type {FiringAlarm} from '../AlarmAPIType';
 
@@ -57,11 +57,11 @@ export default function FiringAlerts() {
   );
   const [alertData, setAlertData] = useState<?Array<FiringAlarm>>(null);
   const classes = useStyles();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
+  const snackbars = useSnackbars();
+  const networkId = useNetworkId();
   const {error, isLoading, response} = apiUtil.useAlarmsApi(
     apiUtil.viewFiringAlerts,
-    {networkId: match.params.networkId},
+    {networkId},
     lastRefreshTime,
   );
 
@@ -96,14 +96,15 @@ export default function FiringAlerts() {
     setSelectedRow(null);
   }, [setSelectedRow]);
 
-  if (error) {
-    enqueueSnackbar(
-      `Unable to load firing alerts. ${
-        error.response ? error.response.data.message : error.message || ''
-      }`,
-      {variant: 'error'},
-    );
-  }
+  React.useEffect(() => {
+    if (error) {
+      snackbars.error(
+        `Unable to load firing alerts. ${
+          error.response ? error.response.data.message : error.message || ''
+        }`,
+      );
+    }
+  }, [error, snackbars]);
 
   if (!isLoading && alertData?.length === 0) {
     return (
@@ -130,7 +131,7 @@ export default function FiringAlerts() {
             size="small"
             variant="contained"
             component={Link}
-            to={`/alarms/${match.params.networkName || ''}/rules`}>
+            to={`/alarms/${networkId || ''}/rules`}>
             Add Alert Rule
           </Button>
         </Grid>
@@ -146,10 +147,9 @@ export default function FiringAlerts() {
             {
               title: 'name',
               getValue: x => x.labels?.alertname,
-              renderFunc: (data, classes) => {
+              renderFunc: data => {
                 const entity =
                   data.labels.entity || data.labels.nodeMac || null;
-                const desc = data?.annotations?.description ?? '';
                 return (
                   <>
                     <Typography variant="body1">
@@ -158,7 +158,6 @@ export default function FiringAlerts() {
                     {entity && (
                       <Typography variant="body2">{entity}</Typography>
                     )}
-                    <div className={classes.secondaryItalicCell}>{desc}</div>
                   </>
                 );
               },
@@ -183,18 +182,6 @@ export default function FiringAlerts() {
                   </>
                 );
               },
-            },
-            {
-              title: 'labels',
-              getValue: x => toLabels(x.labels),
-              render: 'labels',
-              hideFields: ['alertname', 'severity', 'team'],
-            },
-            {
-              title: 'annotations',
-              getValue: x => toLabels(x.annotations),
-              render: 'labels',
-              hideFields: ['description'],
             },
           ]}
           tableData={alertData || []}

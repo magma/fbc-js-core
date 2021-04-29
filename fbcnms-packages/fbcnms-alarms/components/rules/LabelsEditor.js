@@ -19,9 +19,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
 import InputLabel from '@material-ui/core/InputLabel';
-import SyncIcon from '@material-ui/icons/Sync';
 import TextField from '@material-ui/core/TextField';
-import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import type {Labels} from '../AlarmAPIType';
 
@@ -33,7 +31,6 @@ type Props = {
 };
 
 export default function LabelsEditor({labels, onChange}: Props) {
-  const [initialState] = React.useState(labels);
   /**
    * Use an array instead of an object because editing an object's key is not
    * possible in this context without causing weird issues.
@@ -87,10 +84,6 @@ export default function LabelsEditor({labels, onChange}: Props) {
     updateLabels(labelsState.concat([['', '']]));
   }, [updateLabels, labelsState]);
 
-  const resetLabels = React.useCallback(() => {
-    updateLabels(convertLabelsToPairs(initialState, filteredLabels));
-  }, [updateLabels, initialState]);
-
   const removeLabel = React.useCallback(
     index => {
       updateLabels([
@@ -113,17 +106,6 @@ export default function LabelsEditor({labels, onChange}: Props) {
               Add labels to attach data to this alert
             </Typography>
           </>
-        }
-        action={
-          <Tooltip title="Reset labels">
-            <IconButton
-              aria-label="Reset labels"
-              color="default"
-              onClick={resetLabels}
-              size="small">
-              <SyncIcon />
-            </IconButton>
-          </Tooltip>
         }
       />
       <CardContent>
@@ -161,7 +143,6 @@ export default function LabelsEditor({labels, onChange}: Props) {
                 </Grid>
               </Grid>
             ))}
-
           <Grid item>
             <Button
               color="primary"

@@ -7,19 +7,15 @@
  * @flow strict-local
  * @format
  */
-import 'jest-dom/extend-expect';
+
 import * as React from 'react';
 import FiringAlerts from '../FiringAlerts';
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {alarmTestUtil} from '../../../test/testHelpers';
 
 import type {FiringAlarm} from '../../AlarmAPIType';
 
 const {apiUtil, AlarmsWrapper} = alarmTestUtil();
-
-afterEach(() => {
-  cleanup();
-});
 
 test('renders with default props', () => {
   const {getByText} = render(

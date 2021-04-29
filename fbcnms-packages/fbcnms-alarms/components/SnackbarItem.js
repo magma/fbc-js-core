@@ -17,7 +17,7 @@ import Typography from '@material-ui/core/Typography';
 import WarningIcon from '@material-ui/icons/Warning';
 import classNames from 'classnames';
 import {blue60, gray4, green, red, yellow} from '../theme/colors';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useSnackbar} from 'notistack';
 import {withForwardRef} from './ForwardRef';
 import type {ForwardRef} from './ForwardRef';

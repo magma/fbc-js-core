@@ -7,17 +7,16 @@
  * @flow
  * @format
  */
-import 'jest-dom/extend-expect';
+
 import * as React from 'react';
 import LabelsEditor from '../LabelsEditor';
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 
 const commonProps = {
   labels: {},
   onChange: jest.fn(),
 };
 afterEach(() => {
-  cleanup();
   jest.resetAllMocks();
 });
 
