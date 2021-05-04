@@ -10,8 +10,8 @@
 
 import * as React from 'react';
 import axios from 'axios';
-import useRouter from '../hooks/useRouter';
-import {useEnqueueSnackbar} from '../hooks/useSnackbar';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
+import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import type {AlertRoutingTree} from './AlarmAPIType';
 import type {ApiUtil} from './AlarmsApi';
 import type {GenericRule, RuleInterfaceMap} from './rules/RuleInterface';

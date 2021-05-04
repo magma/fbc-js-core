@@ -24,13 +24,13 @@ import ToggleableExpressionEditor, {
   thresholdToPromQL,
 } from './ToggleableExpressionEditor';
 import useForm from '../../../hooks/useForm';
-import useRouter from '../../../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Labels} from '../../prometheus/PromQL';
 import {Parse} from '../../prometheus/PromQLParser';
 import {SEVERITY} from '../../severity/Severity';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
-import {useSnackbars} from '../../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {AlertConfig, Labels as LabelsMap} from '../../AlarmAPIType';
 import type {GenericRule, RuleEditorProps} from '../RuleInterface';

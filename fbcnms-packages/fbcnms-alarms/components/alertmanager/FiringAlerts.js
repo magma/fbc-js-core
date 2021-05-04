@@ -25,7 +25,7 @@ import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useEffect, useState} from 'react';
 import {useNetworkId} from '../../components/hooks';
-import {useSnackbars} from '../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {FiringAlarm} from '../AlarmAPIType';
 

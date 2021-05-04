@@ -19,8 +19,12 @@ import {Route} from 'react-router-dom';
 import {SnackbarProvider} from 'notistack';
 import {cleanup, render} from '@testing-library/react';
 
-jest.mock('@fbcnms/alarms/hooks/useSnackbar');
-const useSnackbar = require('@fbcnms/alarms/hooks/useSnackbar');
+jest.mock('@fbcnms/ui/hooks/useSnackbar');
+const useSnackbar = require('@fbcnms/ui/hooks/useSnackbar');
+const snackbarsMock = {error: jest.fn(), success: jest.fn()};
+jest
+  .spyOn(useSnackbar, 'useSnackbars')
+  .mockReturnValue(jest.fn(() => snackbarsMock));
 const useMagmaAPIMock = jest
   .spyOn(require('@fbcnms/ui/magma/useMagmaAPI'), 'default')
   .mockReturnValue({response: []});

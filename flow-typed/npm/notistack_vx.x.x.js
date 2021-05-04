@@ -6,7 +6,7 @@ declare module 'notistack' {
 
   declare type SnackBarKey = string | number;
   declare type MutualProps = {|
-    children?: Node,
+    content?: Node,
     preventDuplicate?: boolean,
     action?: Node | ((key: SnackBarKey) => Node),
     anchorOrigin?: {
@@ -33,6 +33,7 @@ declare module 'notistack' {
     iconVariant?: {success?: Node, warning?: Node, error?: Node, info?: Node},
     hideIconVariant?: boolean,
     dense?: boolean,
+    children: Node,
     ...MutualProps,
   |};
 
@@ -47,7 +48,7 @@ declare module 'notistack' {
     key?: string | number,
     variant?: Variants,
     persist?: boolean,
-    children?: SnackBarKey => Node,
+    content?: SnackBarKey => Node,
     ...MutualProps,
   |};
 

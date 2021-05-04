@@ -13,7 +13,7 @@ import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import useRouter from '../../../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {useAlarmContext} from '../../AlarmContext';
 
 type Props = {

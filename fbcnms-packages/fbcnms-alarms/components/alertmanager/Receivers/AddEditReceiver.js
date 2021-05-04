@@ -22,9 +22,9 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import WebhookConfigEditor from './WebhookConfigEditor';
 import useForm from '../../../hooks/useForm';
-import useRouter from '../../../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {useAlarmContext} from '../../AlarmContext';
-import {useSnackbars} from '../../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {
   AlertReceiver,

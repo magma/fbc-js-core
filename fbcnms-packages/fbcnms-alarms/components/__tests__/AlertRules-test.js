@@ -16,17 +16,17 @@ import {alarmTestUtil} from '../../test/testHelpers';
 import {assertType} from '../../util/assert';
 import {mockPrometheusRule} from '../../test/testData';
 
-jest.mock('../../hooks/useSnackbar');
-jest.mock('../../hooks/useRouter');
+jest.mock('@fbcnms/ui/hooks/useSnackbar');
+jest.mock('@fbcnms/ui/hooks/useRouter');
 
 const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 
 const snackbarsMock = {error: jest.fn(), success: jest.fn()};
 jest
-  .spyOn(require('../../hooks/useSnackbar'), 'useSnackbars')
-  .mockImplementation(jest.fn(() => snackbarsMock));
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useSnackbars')
+  .mockReturnValue(jest.fn(() => snackbarsMock));
 jest
-  .spyOn(require('../../hooks/useRouter'), 'default')
+  .spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});
 
 const useLoadRulesMock = jest

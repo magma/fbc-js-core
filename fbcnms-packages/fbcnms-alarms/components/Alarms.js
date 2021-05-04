@@ -23,7 +23,7 @@ import Suppressions from './alertmanager/Suppressions';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import getPrometheusRuleInterface from './rules/PrometheusEditor/getRuleInterface';
-import useRouter from '../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {makeStyles} from '@material-ui/styles';
 import {matchPath} from 'react-router';

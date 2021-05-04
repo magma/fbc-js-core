@@ -24,7 +24,7 @@ import useForm from '../../../hooks/useForm';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
 import {useNetworkId} from '../../../components/hooks';
-import {useSnackbars} from '../../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {AlertManagerGlobalConfig, HTTPConfig} from '../../AlarmAPIType';
 import type {Props as EditorProps} from '../../common/Editor';
