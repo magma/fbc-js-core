@@ -100,6 +100,17 @@ export const MagmaAlarmsApiUtil: ApiUtil = {
       route: route,
     });
   },
+  // Metric Names
+  getMetricNames: async ({networkId}) => {
+    const series = await MagmaV1API.getNetworksByNetworkIdPrometheusSeries({
+      networkId: nullthrows(networkId),
+    });
+    const names = new Set([]);
+    series.forEach(value => {
+      names.add(value.__name__);
+    });
+    return Array.from(names);
+  },
   // Metric Series
   getMetricSeries: async ({networkId}) => {
     const series = await MagmaV1API.getNetworksByNetworkIdPrometheusSeries({

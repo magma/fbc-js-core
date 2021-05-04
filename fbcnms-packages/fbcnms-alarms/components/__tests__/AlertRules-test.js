@@ -8,6 +8,7 @@
  * @format
  */
 
+import 'jest-dom/extend-expect';
 import * as React from 'react';
 import AlertRules from '../AlertRules';
 import {act, fireEvent, render} from '@testing-library/react';
@@ -23,7 +24,7 @@ const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 const snackbarsMock = {error: jest.fn(), success: jest.fn()};
 jest
   .spyOn(require('../../hooks/useSnackbar'), 'useSnackbars')
-  .mockReturnValue(snackbarsMock);
+  .mockImplementation(jest.fn(() => snackbarsMock));
 jest
   .spyOn(require('../../hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});

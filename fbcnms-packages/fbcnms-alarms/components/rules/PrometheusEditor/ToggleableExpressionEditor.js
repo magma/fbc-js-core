@@ -203,7 +203,7 @@ function MetricSelector(props: {
         onChange={(_e, value) => {
           props.onChange({...props.expression, metricName: value});
         }}
-        renderInput={params => <TextField {...params} required />}
+        renderInput={params => <TextField {...(params: any)} required />}
       />
     </Grid>
   );
@@ -435,7 +435,7 @@ function LabelFilter(props: {
             }}
             renderInput={params => (
               <TextField
-                {...params}
+                {...(params: any)}
                 required
                 id={'value-input-' + props.filterIdx}
               />

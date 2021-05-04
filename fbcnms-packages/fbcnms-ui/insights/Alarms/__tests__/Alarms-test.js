@@ -73,7 +73,8 @@ describe('Firing Alerts', () => {
     // assert that the top level firing alerts header is visible
     expect(getByTestId('firing-alerts')).toBeInTheDocument();
     expect(getByText('<<TEST ALERT>>')).toBeInTheDocument();
-    expect(getByText('<<TEST DESCRIPTION>>')).toBeInTheDocument();
+    // TODO(andreilee): This has been removed
+    // expect(getByText('<<TEST DESCRIPTION>>')).toBeInTheDocument();
   });
 
   test('if an error occurs while loading alerts, enqueues an error snackbar', () => {
@@ -81,10 +82,10 @@ describe('Firing Alerts', () => {
       error: {message: 'an error occurred'},
     });
 
-    const enqueueSnackbarMock = jest.fn();
+    const snackbarsMock = {error: jest.fn(), success: jest.fn()};
     jest
-      .spyOn(useSnackbar, 'useEnqueueSnackbar')
-      .mockReturnValueOnce(enqueueSnackbarMock);
+      .spyOn(useSnackbar, 'useSnackbars')
+      .mockImplementation(jest.fn(() => snackbarsMock));
 
     render(
       <Wrapper route={'/alerts'}>
@@ -92,6 +93,6 @@ describe('Firing Alerts', () => {
       </Wrapper>,
     );
 
-    expect(enqueueSnackbarMock).toHaveBeenCalled();
+    expect(snackbarsMock.error).toHaveBeenCalled();
   });
 });

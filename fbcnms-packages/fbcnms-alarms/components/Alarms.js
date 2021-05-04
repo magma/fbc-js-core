@@ -8,6 +8,7 @@
  * @format
  */
 
+//$FlowFixMe: flow-typed does not provide definition for this
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AlarmContext from './AlarmContext';
 import AlertRules from './AlertRules';

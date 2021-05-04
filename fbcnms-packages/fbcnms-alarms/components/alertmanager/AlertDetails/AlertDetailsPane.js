@@ -208,7 +208,7 @@ export function Detail({
   title: string,
   children: React.Node,
 }) {
-  const iconStyles = useDetailIconStyles();
+  const iconStyles: $Shape<$Values<SvgIconProps>> = useDetailIconStyles();
   return (
     <Grid item container wrap="nowrap" spacing={1}>
       <Grid item>
