@@ -21,10 +21,11 @@ jest.mock('@fbcnms/ui/hooks/useRouter');
 
 const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 
+jest.spyOn(apiUtil, 'getMetricSeries').mockResolvedValue([]);
 const snackbarsMock = {error: jest.fn(), success: jest.fn()};
 jest
   .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useSnackbars')
-  .mockReturnValue(jest.fn(() => snackbarsMock));
+  .mockReturnValue(snackbarsMock);
 jest
   .spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});
@@ -141,7 +142,7 @@ describe('AddEditAlert > Prometheus Editor', () => {
       isLoading: false,
     });
     const {getByTestId, getByLabelText} = render(
-      <AlarmsWrapper>
+      <AlarmsWrapper thresholdEditorEnabled={false}>
         <AlertRules />
       </AlarmsWrapper>,
     );
@@ -169,15 +170,15 @@ describe('AddEditAlert > Prometheus Editor', () => {
       });
     });
     act(() => {
-      fireEvent.change(getByLabelText(/metric/i), {
-        target: {value: 'vector(1)'},
+      fireEvent.change(getByLabelText(/expression/i), {
+        target: {value: 'vector(1) == 0'},
       });
     });
     // This triggers an async call so must be awaited
     await act(async () => {
       fireEvent.submit(getByTestId('editor-form'));
     });
-    expect(createAlertRuleMock.mock.calls.slice(-2)[0][0]).toMatchObject({
+    expect(createAlertRuleMock.mock.calls[0][0]).toMatchObject({
       networkId: 'test',
       rule: {
         alert: '<<ALERTNAME>>',

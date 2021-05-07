@@ -192,7 +192,6 @@ export default function PrometheusEditor(props: PrometheusEditorProps) {
   );
 
   const toggleMode = () => setAdvancedEditorMode(!advancedEditorMode);
-
   return (
     <RuleEditorBase
       initialState={editorBaseInitialState}
@@ -529,6 +528,9 @@ function useThresholdExpressionEditorState({
    * the expression cannot be parsed, swaps to the advanced editor mode.
    */
   React.useEffect(() => {
+    if (!thresholdEditorEnabled) {
+      return;
+    }
     if (!expression) {
       setAdvancedEditorMode(false);
     } else if (parsedExpression) {
@@ -546,7 +548,7 @@ function useThresholdExpressionEditorState({
     }
     // we only want this to run when the parsedExpression changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedExpression]);
+  }, [parsedExpression, thresholdEditorEnabled]);
 
   return {
     thresholdExpression,
