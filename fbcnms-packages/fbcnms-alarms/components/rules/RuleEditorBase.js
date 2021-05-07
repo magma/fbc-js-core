@@ -91,6 +91,7 @@ export default function RuleEditorBase({
               <CardContent>
                 <Grid item>
                   <TextField
+                    id="rulename"
                     disabled={!isNew}
                     required
                     label="Rule Name"

@@ -17,12 +17,12 @@ import SimpleTable from './table/SimpleTable';
 import TableActionDialog from './table/TableActionDialog';
 import TableAddButton from './table/TableAddButton';
 import axios from 'axios';
-import useRouter from '../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Parse} from './prometheus/PromQLParser';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from './AlarmContext';
 import {useLoadRules} from './hooks';
-import {useSnackbars} from '../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {ColumnData} from './table/SimpleTable';
 import type {GenericRule} from './rules/RuleInterface';

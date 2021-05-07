@@ -23,7 +23,7 @@ import {LABEL_OPERATORS} from '../../prometheus/PromQLTypes';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
 import {useNetworkId} from '../../../components/hooks';
-import {useSnackbars} from '../../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {BinaryComparator} from '../../prometheus/PromQLTypes';
 import type {InputChangeFunc} from './PrometheusEditor';
@@ -110,7 +110,7 @@ export function AdvancedExpressionEditor(props: {
 }) {
   return (
     <Grid item>
-      <InputLabel htmlFor="metric-advanced-input">Label</InputLabel>
+      <InputLabel htmlFor="metric-advanced-input">Expression</InputLabel>
       <TextField
         id="metric-advanced-input"
         required

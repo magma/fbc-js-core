@@ -24,13 +24,13 @@ import ToggleableExpressionEditor, {
   thresholdToPromQL,
 } from './ToggleableExpressionEditor';
 import useForm from '../../../hooks/useForm';
-import useRouter from '../../../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Labels} from '../../prometheus/PromQL';
 import {Parse} from '../../prometheus/PromQLParser';
 import {SEVERITY} from '../../severity/Severity';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
-import {useSnackbars} from '../../../hooks/useSnackbar';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {AlertConfig, Labels as LabelsMap} from '../../AlarmAPIType';
 import type {GenericRule, RuleEditorProps} from '../RuleInterface';
@@ -192,7 +192,6 @@ export default function PrometheusEditor(props: PrometheusEditorProps) {
   );
 
   const toggleMode = () => setAdvancedEditorMode(!advancedEditorMode);
-
   return (
     <RuleEditorBase
       initialState={editorBaseInitialState}
@@ -529,6 +528,9 @@ function useThresholdExpressionEditorState({
    * the expression cannot be parsed, swaps to the advanced editor mode.
    */
   React.useEffect(() => {
+    if (!thresholdEditorEnabled) {
+      return;
+    }
     if (!expression) {
       setAdvancedEditorMode(false);
     } else if (parsedExpression) {
@@ -546,7 +548,7 @@ function useThresholdExpressionEditorState({
     }
     // we only want this to run when the parsedExpression changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [parsedExpression]);
+  }, [parsedExpression, thresholdEditorEnabled]);
 
   return {
     thresholdExpression,

@@ -63,6 +63,7 @@ module.exports.overrides = [
       '**/tests/*.js',
       'testHelpers.js',
       'testData.js',
+      'jest-setup.js',
     ],
   },
   {

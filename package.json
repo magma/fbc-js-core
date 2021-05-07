@@ -23,6 +23,8 @@
     "fbt": "^0.10.6"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.10",
+    "@testing-library/react": "^9.4.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.6.3",
     "eslint": "^6.0.1",
@@ -53,7 +55,7 @@
     "@babel/runtime": "^7.3.4"
   },
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint --ignore-path .eslintignore",
+    "eslint": "./node_modules/.bin/eslint --ignore-path .eslintignore --",
     "jest": "echo 'Dont run jest directly, use \"yarn run test\"' && exit 1",
     "test": "NODE_ENV=test jest",
     "test:ci": "NODE_ENV=test jest -w 1",

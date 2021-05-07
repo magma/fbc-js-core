@@ -18,10 +18,10 @@ jest.useFakeTimers();
 
 const enqueueSnackbarMock = jest.fn();
 jest
-  .spyOn(require('../../hooks/useSnackbar'), 'useEnqueueSnackbar')
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useEnqueueSnackbar')
   .mockReturnValue(enqueueSnackbarMock);
 
-jest.spyOn(require('../../hooks/useRouter'), 'default').mockReturnValue({
+jest.spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default').mockReturnValue({
   match: {
     params: {
       networkId: 'test',
