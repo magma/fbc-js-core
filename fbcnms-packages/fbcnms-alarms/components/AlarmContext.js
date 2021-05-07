@@ -20,6 +20,7 @@ export type AlarmContext = {|
   filterLabels?: (labels: Labels) => Labels,
   ruleMap: RuleInterfaceMap<*>,
   getAlertType?: ?GetAlertType,
+  getNetworkId?: () => string,
   // feature flags
   thresholdEditorEnabled?: boolean,
   alertManagerGlobalConfigEnabled?: boolean,
