@@ -7,15 +7,17 @@
  * @flow
  * @format
  */
-
+import * as React from 'react';
+import {AlarmsTestWrapper, alarmTestUtil} from '../../test/testHelpers';
 import {act as hooksAct, renderHook} from '@testing-library/react-hooks';
 import {mockRuleInterface} from '../../test/testData';
-import {useLoadRules} from '../hooks';
+import {useLoadRules, useNetworkId} from '../hooks';
 import type {GenericRule} from '../rules/RuleInterface';
 import type {RenderResult} from '@testing-library/react-hooks';
 
 jest.useFakeTimers();
 
+const {AlarmsWrapper} = alarmTestUtil();
 const enqueueSnackbarMock = jest.fn();
 jest
   .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useEnqueueSnackbar')
@@ -84,6 +86,31 @@ describe('useLoadRules hook', () => {
     expect(prometheusMock).toHaveBeenCalled();
     expect(eventsMock).toHaveBeenCalled();
     expect(result.current.rules).toHaveLength(2);
+  });
+});
+
+describe('useNetworkId hook', () => {
+  it('returns match.params.networkId by default', () => {
+    const {result} = renderHook(() => useNetworkId(), {
+      wrapper: ({children}) => (
+        <AlarmsTestWrapper>
+          <AlarmsWrapper>{children}</AlarmsWrapper>
+        </AlarmsTestWrapper>
+      ),
+    });
+    expect(result.current).toBe('test');
+  });
+  it('returns AlarmsContext.getNetworkId if provided', () => {
+    const {result} = renderHook(() => useNetworkId(), {
+      wrapper: ({children}) => (
+        <AlarmsTestWrapper>
+          <AlarmsWrapper getNetworkId={() => 'getnetworkid-test'}>
+            {children}
+          </AlarmsWrapper>
+        </AlarmsTestWrapper>
+      ),
+    });
+    expect(result.current).toBe('getnetworkid-test');
   });
 });
 

@@ -20,7 +20,7 @@ declare module '@material-ui/core/@@SvgIcon' {
     | 'secondary'
     | 'default';
   declare export type SvgIconProps = SVGElementProps & {
-    classes?: {|
+    classes?: $Shape<{|
       root?: string,
       colorSecondary?: string,
       colorAction?: string,
@@ -30,7 +30,7 @@ declare module '@material-ui/core/@@SvgIcon' {
       fontSizeInherit?: string,
       fontSizeSmall?: string,
       fontSizeLarge?: string,
-    |},
+    |}>,
     color?: PropTypes$Color | 'action' | 'disabled' | 'error',
     fontSize?: 'inherit' | 'default' | 'small' | 'large',
     htmlColor?: string,
@@ -263,6 +263,10 @@ declare module '@material-ui/icons/AccountCircleSharp' {
   declare export default SvgIcon;
 }
 declare module '@material-ui/icons/AccountCircleTwoTone' {
+  import typeof SvgIcon from '@material-ui/core/@@SvgIcon';
+  declare export default SvgIcon;
+}
+declare module '@material-ui/icons/AccountTree' {
   import typeof SvgIcon from '@material-ui/core/@@SvgIcon';
   declare export default SvgIcon;
 }
@@ -21087,6 +21091,9 @@ declare module '@material-ui/icons' {
   declare export {
     default as AccountCircleTwoTone,
   } from '@material-ui/icons/AccountCircleTwoTone';
+  declare export {
+    default as AccountTree,
+  } from '@material-ui/icons/AccountTree';
   declare export { default as AcUnit } from '@material-ui/icons/AcUnit';
   declare export {
     default as AcUnitOutlined,

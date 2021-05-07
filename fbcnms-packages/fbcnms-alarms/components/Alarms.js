@@ -8,7 +8,6 @@
  * @format
  */
 
-//$FlowFixMe: flow-typed does not provide definition for this
 import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import AlarmContext from './AlarmContext';
 import AlertRules from './AlertRules';
@@ -89,6 +88,7 @@ type Props<TRuleUnion> = {
   disabledTabs?: Array<string>,
   // context props
   apiUtil: ApiUtil,
+  getNetworkId?: () => string,
   ruleMap?: ?RuleInterfaceMap<TRuleUnion>,
   thresholdEditorEnabled?: boolean,
   alertManagerGlobalConfigEnabled?: boolean,
@@ -101,6 +101,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
     apiUtil,
     filterLabels,
     makeTabLink,
+    getNetworkId,
     disabledTabs,
     thresholdEditorEnabled,
     alertManagerGlobalConfigEnabled,
@@ -126,6 +127,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
         thresholdEditorEnabled,
         alertManagerGlobalConfigEnabled,
         filterLabels,
+        getNetworkId,
         ruleMap: mergedRuleMap,
         getAlertType: getAlertType,
       }}>
