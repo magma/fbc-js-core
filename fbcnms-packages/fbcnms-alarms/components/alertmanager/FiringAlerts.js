@@ -18,6 +18,7 @@ import SimpleTable from '../table/SimpleTable';
 import Slide from '@material-ui/core/Slide';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Link} from 'react-router-dom';
 import {SEVERITY} from '../severity/Severity';
 import {get} from 'lodash';
@@ -49,7 +50,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function FiringAlerts() {
+type Props = {
+  emptyAlerts?: React$Node,
+};
+
+export default function FiringAlerts(props: Props) {
+  const {match} = useRouter();
   const {apiUtil, filterLabels} = useAlarmContext();
   const [selectedRow, setSelectedRow] = useState<?FiringAlarm>(null);
   const [lastRefreshTime, _setLastRefreshTime] = useState<string>(
@@ -116,25 +122,33 @@ export default function FiringAlerts() {
         justify="center"
         data-testid="no-alerts-icon"
         style={{minHeight: '60vh'}}>
-        <Grid item>
-          <AddAlertTwoToneIcon
-            color="primary"
-            className={classes.addAlertIcon}
-          />
-        </Grid>
-        <Grid item>
-          <span className={classes.helperText}>Start creating alert rules</span>
-        </Grid>
-        <Grid item>
-          <Button
-            color="primary"
-            size="small"
-            variant="contained"
-            component={Link}
-            to={`/alarms/${networkId || ''}/rules`}>
-            Add Alert Rule
-          </Button>
-        </Grid>
+        {!(props.emptyAlerts ?? false) ? (
+          <>
+            <Grid item>
+              <AddAlertTwoToneIcon
+                color="primary"
+                className={classes.addAlertIcon}
+              />
+            </Grid>
+            <Grid item>
+              <span className={classes.helperText}>
+                Start creating alert rules
+              </span>
+            </Grid>
+            <Grid item>
+              <Button
+                color="primary"
+                size="small"
+                variant="contained"
+                component={Link}
+                to={`${match.url.slice(0, match.url.lastIndexOf('/'))}/rules`}>
+                Add Alert Rule
+              </Button>
+            </Grid>
+          </>
+        ) : (
+          <>{props.emptyAlerts}</>
+        )}
       </Grid>
     );
   }

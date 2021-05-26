@@ -94,6 +94,7 @@ type Props<TRuleUnion> = {
   alertManagerGlobalConfigEnabled?: boolean,
   filterLabels?: (labels: Labels) => Labels,
   getAlertType?: (alert: FiringAlarm) => string,
+  emptyAlerts?: React$Node,
 };
 
 export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
@@ -107,6 +108,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
     alertManagerGlobalConfigEnabled,
     ruleMap,
     getAlertType,
+    emptyAlerts,
   } = props;
   const tabStyles = useTabStyles();
   const {match, location} = useRouter();
@@ -132,7 +134,7 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
         getAlertType: getAlertType,
       }}>
       <Grid container spacing={2} justify="space-between">
-        <Grid item xs={3}>
+        <Grid item xs={12}>
           <Tabs
             value={currentTabMatch?.params?.tabName || DEFAULT_TAB_NAME}
             indicatorColor="primary"
@@ -160,7 +162,12 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
       <Switch>
         <Route
           path={`${match.path}/alerts`}
-          render={() => <FiringAlerts filterLabels={filterLabels} />}
+          render={() => (
+            <FiringAlerts
+              emptyAlerts={emptyAlerts}
+              filterLabels={filterLabels}
+            />
+          )}
         />
         <Route
           path={`${match.path}/rules`}
