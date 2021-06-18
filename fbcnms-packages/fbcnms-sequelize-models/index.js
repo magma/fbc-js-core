@@ -8,7 +8,7 @@
  * @format
  */
 
-import type {Options} from 'sequelize';
+import type {Options, Transaction} from 'sequelize';
 
 import AuditLogEntryModel from './models/audit_log_entry';
 import FeatureFlagModel from './models/featureflag';
@@ -26,6 +26,14 @@ export const sequelize = new Sequelize(
   config.password,
   config,
 );
+
+const SequelizeTables = [
+  'AuditLogEntries',
+  'FeatureFlags',
+  'Organizations',
+  'Users',
+];
+const SequenceColumn = 'id';
 
 const db = createNmsDb(sequelize);
 
@@ -186,6 +194,47 @@ export async function exportToDatabase(targetConfig: Options) {
     user.tabs = user.tabs || [];
   });
   await targetDb.User.bulkCreate(getDataValues(users));
+
+  await resetPgIdSeq(targetSequelize);
+}
+
+/**
+ * Reset the Postgres ID sequence.
+ * When migrating table data to Postgres, it is necessary to reset the id
+ * sequence, otherwise inserts will fail due to unique ID constraint.
+ */
+async function resetPgIdSeq(sequelize: Sequelize) {
+  await sequelize.transaction(
+    async (transaction: Transaction): Promise<void> => {
+      try {
+        for (const table of SequelizeTables) {
+          // Get current highest value from the table
+          const [
+            [{max}],
+          ] = await sequelize.query(
+            `SELECT MAX("${SequenceColumn}") AS max FROM "${table}";`,
+            {transaction},
+          );
+
+          // Set the autoincrement current value to highest value + 1
+          await sequelize.query(
+            `ALTER SEQUENCE "${table}_id_seq" RESTART WITH ${max + 1};`,
+            {transaction},
+          );
+        }
+      } catch (exception) {
+        // This likely means we're just not running in Postgres.
+        // Do nothing.
+        console.error(
+          'Had an issue resetting ID sequences. ',
+          'If you are running Postgres, you may need to reset ID sequences manually. ',
+          'Otherwise, ignore this error',
+          'Exception: ',
+          exception,
+        );
+      }
+    },
+  );
 }
 
 async function migrateMeta(source: Sequelize, target: Sequelize) {
