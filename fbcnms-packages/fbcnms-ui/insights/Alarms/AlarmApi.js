@@ -29,6 +29,11 @@ export const MagmaAlarmsApiUtil: ApiUtil = {
     });
     return alerts;
   },
+  getTroubleshootingLink: async ({alertName: _}) =>
+    Promise.resolve({
+      link: '',
+      title: 'View Troubleshooting Documentation',
+    }),
   viewMatchingAlerts: async ({networkId: _, expression: __}) => {
     console.warn('not implemented');
     return [];

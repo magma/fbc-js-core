@@ -25,6 +25,11 @@ export type ApiRequest = {
   cancelToken?: CancelToken,
 };
 
+type TroubleshootingLinkType = {
+  link: string,
+  title: string,
+};
+
 export type ApiUtil = {|
   /**
    * React hook for loading data whenever a component mounts and refreshing in
@@ -40,7 +45,9 @@ export type ApiUtil = {|
 
   //alerts
   viewFiringAlerts: (req: ApiRequest) => Promise<Array<FiringAlarm>>,
-
+  getTroubleshootingLink: (req: {
+    alertName: string,
+  }) => Promise<?TroubleshootingLinkType>,
   //rules
   viewMatchingAlerts: (
     req: {expression: string} & ApiRequest,
