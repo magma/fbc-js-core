@@ -8,6 +8,8 @@
  * @format
  */
 
+import Sequelize from 'sequelize';
+
 import {Organization, jsonArrayContains} from '@fbcnms/sequelize-models';
 import type {ExpressRequest, ExpressResponse, NextFunction} from 'express';
 import type {OrganizationType} from '@fbcnms/sequelize-models/models/organization';
@@ -24,7 +26,10 @@ async function getOrganizationFromHost(
   const subdomain = host.split('.')[0];
   return await Organization.findOne({
     where: {
-      name: subdomain,
+      name: Sequelize.where(
+        Sequelize.fn('lower', Sequelize.col('name')),
+        Sequelize.fn('lower', subdomain),
+      ),
     },
   });
 }

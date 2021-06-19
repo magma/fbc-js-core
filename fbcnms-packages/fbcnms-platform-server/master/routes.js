@@ -13,6 +13,7 @@ import type {FBCNMSRequest} from '@fbcnms/auth/access';
 import type {FeatureID} from '@fbcnms/types/features';
 
 import MagmaV1API from '../magma';
+import Sequelize from 'sequelize';
 import asyncHandler from '@fbcnms/util/asyncHandler';
 import express from 'express';
 import featureConfigs from '../features';
@@ -37,7 +38,12 @@ router.get(
   '/organization/async/:name',
   asyncHandler(async (req: FBCNMSRequest, res) => {
     const organization = await Organization.findOne({
-      where: {name: req.params.name},
+      where: {
+        name: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('name')),
+          Sequelize.fn('lower', req.params.name),
+        ),
+      },
     });
     res.status(200).send({organization});
   }),
@@ -111,7 +117,18 @@ router.post(
 router.post(
   '/organization/async',
   asyncHandler(async (req: FBCNMSRequest, res) => {
-    const organization = await Organization.create({
+    let organization = await Organization.findOne({
+      where: {
+        name: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('name')),
+          Sequelize.fn('lower', req.body.name),
+        ),
+      },
+    });
+    if (organization) {
+      return res.status(404).send({error: 'Organization already exists'});
+    }
+    organization = await Organization.create({
       name: req.body.name,
       networkIDs: req.body.networkIDs,
       customDomains: req.body.customDomains,
@@ -129,7 +146,12 @@ router.put(
   '/organization/async/:name',
   asyncHandler(async (req: FBCNMSRequest, res) => {
     const organization = await Organization.findOne({
-      where: {name: req.params.name},
+      where: {
+        name: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('name')),
+          Sequelize.fn('lower', req.body.name),
+        ),
+      },
     });
     if (!organization) {
       return res.status(404).send({error: 'Organization does not exist'});
@@ -145,7 +167,12 @@ router.post(
   '/organization/async/:name/add_user',
   asyncHandler(async (req: FBCNMSRequest, res) => {
     const organization = await Organization.findOne({
-      where: {name: req.params.name},
+      where: {
+        name: Sequelize.where(
+          Sequelize.fn('lower', Sequelize.col('name')),
+          Sequelize.fn('lower', req.params.name),
+        ),
+      },
     });
     if (!organization) {
       return res.status(404).send({error: 'Organization does not exist'});
@@ -162,7 +189,12 @@ router.post(
       // uses SSO for login, give it a random password
       if (props.password === undefined) {
         const organization = await Organization.findOne({
-          where: {name: req.params.name},
+          where: {
+            name: Sequelize.where(
+              Sequelize.fn('lower', Sequelize.col('name')),
+              Sequelize.fn('lower', req.params.name),
+            ),
+          },
         });
         if (organization && organization.ssoEntrypoint) {
           props.password = Math.random().toString(36);
