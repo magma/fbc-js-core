@@ -1,10 +1,10 @@
 {
   "name": "@fbcnms/platform-server",
-  "version": "0.1.28",
+  "version": "0.1.29",
   "dependencies": {
     "@fbcnms/auth": "^0.1.0",
     "@fbcnms/babel-register": "^0.1.0",
-    "@fbcnms/express-middleware": "^0.1.0",
+    "@fbcnms/express-middleware": "^0.1.5",
     "@fbcnms/logging": "^0.1.0",
     "@fbcnms/magma-api": "^0.1.0",
     "@fbcnms/sequelize-models": "^0.1.9",
