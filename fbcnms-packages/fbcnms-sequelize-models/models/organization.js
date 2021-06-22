@@ -135,6 +135,10 @@ export default (
       },
     },
   );
+  Organization.addHook('beforeCreate', 'nameToLowerCase', organization => {
+    organization.name = organization.name.toLowerCase();
+    return organization;
+  });
   Organization.associate = function (_models) {
     // associations can be defined here
   };
