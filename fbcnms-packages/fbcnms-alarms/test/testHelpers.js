@@ -47,6 +47,7 @@ export function mockApiUtil(merge?: $Shape<ApiUtil>): ApiUtil {
       useAlarmsApi: useMagmaAPIMock,
       viewFiringAlerts: jest.fn(),
       viewMatchingAlerts: jest.fn(),
+      getTroubleshootingLink: jest.fn(),
       createAlertRule: jest.fn(),
       editAlertRule: jest.fn(),
       getAlertRules: jest.fn(),

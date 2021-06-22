@@ -22,6 +22,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
 import MetricAlertViewer from './MetricAlertViewer';
 import Paper from '@material-ui/core/Paper';
 import SeverityIndicator from '../../severity/SeverityIndicator';
@@ -29,6 +30,7 @@ import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {
   AlertViewerProps,
@@ -49,6 +51,10 @@ const useStyles = makeStyles(theme => ({
   objectViewerValue: {
     wordBreak: 'break-word',
   },
+  objectViewerItem: {
+    marginBottom: '0',
+    justifyContent: 'space-between',
+  },
 }));
 
 type Props = {|
@@ -62,18 +68,15 @@ export default function AlertDetailsPane({alert, onClose}: Props) {
   const alertType = getAlertType ? getAlertType(alert) : '';
   const {startsAt, labels} = alert || {};
   const {alertname, severity} = labels || {};
-
   const AlertViewer = getAlertViewer(ruleMap, alertType);
+
   return (
-    <Paper
-      className={classes.root}
-      elevation={1}
-      data-testid="alert-details-pane">
-      <Grid container direction="column" spacing={2}>
+    <Paper elevation={1} data-testid="alert-details-pane">
+      <Grid container direction="column" spacing={2} className={classes.root}>
         <Grid item container direction="column" spacing={1}>
           <Grid item container justify="space-between">
             <Grid item>
-              <Typography variant="h6">{alertname}</Typography>
+              <SeverityIndicator severity={severity} chip={true} />
             </Grid>
             <Grid item>
               <IconButton
@@ -86,19 +89,17 @@ export default function AlertDetailsPane({alert, onClose}: Props) {
             </Grid>
           </Grid>
           <Grid item>
-            <AlertDate date={startsAt} />
+            <Typography variant="h5">{alertname}</Typography>
           </Grid>
           <Grid item>
-            <SeverityIndicator severity={severity} />
+            <AlertDate date={startsAt} />
           </Grid>
-        </Grid>
-        <Grid item>
-          <Divider />
         </Grid>
         <Grid item>
           <AlertViewer alert={alert} />
         </Grid>
       </Grid>
+      <AlertTroubleshootingLink alertName={alertname} />
     </Paper>
   );
 }
@@ -132,6 +133,54 @@ function AlertDate({date}: {date: string}) {
 }
 
 /**
+ * Link to troubleshooting documentation or display nothing if no link provided
+ */
+function AlertTroubleshootingLink({alertName}: {alertName: string}) {
+  const classes = useStyles();
+  const snackbars = useSnackbars();
+  const {apiUtil} = useAlarmContext();
+  const {error, response: troubleshootingLink} = apiUtil.useAlarmsApi(
+    apiUtil.getTroubleshootingLink,
+    {
+      alertName,
+    },
+  );
+  React.useEffect(() => {
+    if (error) {
+      snackbars.error(
+        `Unable to load troubleshooting link. ${
+          error.response ? error.response.data.message : error.message || ''
+        }`,
+      );
+    }
+  }, [error, snackbars]);
+  return (
+    <>
+      {(troubleshootingLink?.link || '').length > 0 && (
+        <>
+          <Divider variant="fullWidth" />
+          <Grid
+            container
+            direction="column"
+            spacing={2}
+            className={classes.root}>
+            <Grid item>
+              <Link
+                variant="subtitle1"
+                href={troubleshootingLink?.link}
+                target="_blank"
+                rel="noopener">
+                {troubleshootingLink?.title}
+              </Link>
+            </Grid>
+          </Grid>
+        </>
+      )}
+    </>
+  );
+}
+
+/**
  * Shows the key-value pairs of an object such as annotations or labels.
  */
 export function ObjectViewer({object}: {object: Labels}) {
@@ -145,14 +194,15 @@ export function ObjectViewer({object}: {object: Labels}) {
         </Grid>
       )}
       {labelKeys.map(key => (
-        <Grid container item spacing={1}>
+        <Grid container item spacing={4} className={classes.objectViewerItem}>
           <Grid item>
-            <Typography color="textSecondary">{key}:</Typography>
+            <Typography variant="subtitle1">{key}:</Typography>
           </Grid>
           <Grid item>
             <Typography
               className={classes.objectViewerValue}
-              color="textSecondary">
+              color="textSecondary"
+              variant="subtitle1">
               {object[key]}
             </Typography>
           </Grid>
@@ -178,7 +228,7 @@ export function Section({
   return (
     <Grid item container direction="column" spacing={2}>
       <Grid item>
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="h5">{title}</Typography>
       </Grid>
       <Grid item container spacing={2}>
         {children}

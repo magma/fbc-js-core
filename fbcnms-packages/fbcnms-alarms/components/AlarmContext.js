@@ -43,6 +43,7 @@ const emptyApiUtil = {
     isLoading: false,
   }),
   viewFiringAlerts: (..._) => Promise.reject('not implemented'),
+  getTroubleshootingLink: (..._) => Promise.reject('not implemented'),
   viewMatchingAlerts: (..._) => Promise.reject('not implemented'),
   createAlertRule: (..._) => Promise.reject('not implemented'),
   editAlertRule: (..._) => Promise.reject('not implemented'),
