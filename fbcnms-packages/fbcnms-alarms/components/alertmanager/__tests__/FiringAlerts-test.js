@@ -23,9 +23,8 @@ test('renders with default props', () => {
       <FiringAlerts />
     </AlarmsWrapper>,
   );
-  expect(getByText(/name/i)).toBeInTheDocument();
-  expect(getByText(/severity/i)).toBeInTheDocument();
-  expect(getByText(/labels/i)).toBeInTheDocument();
+  expect(getByText(/Start creating alert rules/i)).toBeInTheDocument();
+  expect(getByText(/Add Alert Rule/i)).toBeInTheDocument();
 });
 
 test('renders firing alerts', () => {
@@ -34,7 +33,7 @@ test('renders firing alerts', () => {
       labels: {alertname: '<<testalert>>', severity: 'INFO'},
     },
   ];
-  jest.spyOn(apiUtil, 'viewFiringAlerts').mockReturnValueOnce(firingAlarms);
+  jest.spyOn(apiUtil, 'viewFiringAlerts').mockReturnValue(firingAlarms);
   const {getByText} = render(
     <AlarmsWrapper>
       <FiringAlerts />
@@ -50,7 +49,7 @@ test('clicking view alert shows alert details pane', async () => {
       labels: {alertname: '<<testalert>>', severity: 'INFO'},
     },
   ];
-  jest.spyOn(apiUtil, 'viewFiringAlerts').mockReturnValueOnce(firingAlarms);
+  jest.spyOn(apiUtil, 'viewFiringAlerts').mockReturnValue(firingAlarms);
   const {getByText, getByTestId} = render(
     <AlarmsWrapper>
       <FiringAlerts />

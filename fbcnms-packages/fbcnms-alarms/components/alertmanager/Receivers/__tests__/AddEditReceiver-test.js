@@ -12,6 +12,7 @@ import * as React from 'react';
 import AddEditReceiver from '../AddEditReceiver';
 import {act, fireEvent, render} from '@testing-library/react';
 import {alarmTestUtil} from '../../../../test/testHelpers';
+import {screen} from '@testing-library/dom';
 
 const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 
@@ -21,24 +22,30 @@ const commonProps = {
 };
 
 test('renders', () => {
-  const {getByLabelText} = render(
+  const {getByText} = render(
     <AlarmsWrapper>
       <AddEditReceiver {...commonProps} receiver={{name: ''}} />
     </AlarmsWrapper>,
   );
-  expect(getByLabelText(/receiver name/i)).toBeInTheDocument();
+  expect(getByText(/Details/i)).toBeInTheDocument();
+  expect(getByText(/Slack Channel/i)).toBeInTheDocument();
+  expect(getByText(/Email/i)).toBeInTheDocument();
+  expect(getByText(/Webhook/i)).toBeInTheDocument();
+  expect(getByText(/PagerDuty/i)).toBeInTheDocument();
+  expect(getByText(/Pushover/i)).toBeInTheDocument();
 });
 
 test('clicking the add button adds a new config entry', async () => {
-  const {getByLabelText, getByTestId, queryByTestId} = render(
+  const {getByTestId, queryByTestId} = render(
     <AlarmsWrapper>
       <AddEditReceiver {...commonProps} receiver={{name: ''}} />
     </AlarmsWrapper>,
   );
   expect(queryByTestId('slack-config-editor')).not.toBeInTheDocument();
   act(() => {
-    fireEvent.click(getByLabelText('add new receiver configuration'));
+    fireEvent.click(getByTestId('add-SlackChannel'));
   });
+  screen.debug();
   expect(getByTestId('slack-config-editor')).toBeInTheDocument();
 });
 
@@ -49,21 +56,16 @@ test('editing a config entry then submitting submits the form state', () => {
     </AlarmsWrapper>,
   );
   act(() => {
-    fireEvent.click(getByLabelText('add new receiver configuration'));
-  });
-  act(() => {
-    fireEvent.change(getByLabelText(/receiver name/i), {
+    fireEvent.change(getByLabelText(/Name/i), {
       target: {value: 'test receiver'},
     });
   });
   act(() => {
-    fireEvent.change(getByLabelText(/api url/i), {
-      target: {value: 'https://slack.com/hook'},
-    });
+    fireEvent.click(getByTestId('add-SlackChannel'));
   });
   act(() => {
-    fireEvent.change(getByLabelText(/channel/i), {
-      target: {value: '#testchannel'},
+    fireEvent.change(getByLabelText(/Webhook url/i), {
+      target: {value: 'https://slack.com/hook'},
     });
   });
   act(() => {
@@ -72,9 +74,7 @@ test('editing a config entry then submitting submits the form state', () => {
   expect(apiUtil.createReceiver).toHaveBeenCalledWith({
     receiver: {
       name: 'test receiver',
-      slack_configs: [
-        {api_url: 'https://slack.com/hook', channel: '#testchannel'},
-      ],
+      slack_configs: [{api_url: 'https://slack.com/hook'}],
     },
     networkId: undefined,
   });

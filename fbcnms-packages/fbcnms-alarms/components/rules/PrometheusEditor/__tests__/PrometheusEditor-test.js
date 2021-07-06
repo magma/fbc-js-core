@@ -20,7 +20,7 @@ import type {GenericRule} from '../../RuleInterface';
 jest.mock('@fbcnms/ui/hooks/useSnackbar');
 jest.mock('@fbcnms/ui/hooks/useRouter');
 
-const {AlarmsWrapper} = alarmTestUtil();
+const {AlarmsWrapper, apiUtil} = alarmTestUtil();
 
 const enqueueSnackbarMock = jest.fn();
 jest
@@ -49,6 +49,7 @@ const commonProps = {
 };
 
 test('editing a threshold alert opens the PrometheusEditor with the threshold expression editor enabled', async () => {
+  jest.spyOn(apiUtil, 'getMetricSeries').mockResolvedValue([]);
   const testThresholdRule: GenericRule<AlertConfig> = {
     severity: '',
     ruleType: '',
