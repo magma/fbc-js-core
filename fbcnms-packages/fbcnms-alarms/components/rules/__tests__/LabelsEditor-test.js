@@ -115,40 +115,6 @@ test('labels without a key are filtered out', () => {
     testKey1: 'testVal1',
   });
 });
-test('clicking the reset button resets the label form to its initial state', () => {
-  const {getByDisplayValue, getByLabelText, getByTestId} = render(
-    <LabelsEditor
-      {...commonProps}
-      labels={{
-        testKey1: 'testVal1',
-      }}
-    />,
-  );
-  act(() => {
-    fireEvent.click(getByTestId('add-new-label'));
-  });
-
-  act(() => {
-    fireEvent.change(getByDisplayValue('testKey1'), {
-      target: {value: 'testKey1-edited'},
-    });
-  });
-
-  // ensure state has been changed properly
-  expect(commonProps.onChange).toHaveBeenLastCalledWith({
-    'testKey1-edited': 'testVal1',
-  });
-  expect(getByDisplayValue('testKey1-edited')).not.toBeNull();
-  // reset
-  act(() => {
-    fireEvent.click(getByLabelText(/Reset labels/i));
-  });
-  // ensure state is back to initial state
-  expect(commonProps.onChange).toHaveBeenLastCalledWith({
-    testKey1: 'testVal1',
-  });
-  expect(getByDisplayValue('testKey1')).not.toBeNull();
-});
 test('clicking the remove label button removes a label', () => {
   const {getByLabelText, queryByLabelText} = render(
     <LabelsEditor

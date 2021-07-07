@@ -359,6 +359,7 @@ export default function SimpleTable<T>(props: Props<T>) {
                 event.stopPropagation();
                 onActionsClick(row, event.target);
               }}
+              data-testid="action-menu"
               aria-label="Action Menu">
               <MoreVertIcon color="action" />
             </Button>

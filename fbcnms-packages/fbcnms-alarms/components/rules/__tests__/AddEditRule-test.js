@@ -60,7 +60,7 @@ describe('Receiver select', () => {
         },
       ],
     });
-    const {getByLabelText} = await renderAsync(
+    const {getByTestId} = await renderAsync(
       <AlarmsWrapper>
         <AddEditRule
           {...commonProps}
@@ -71,7 +71,7 @@ describe('Receiver select', () => {
         />
       </AlarmsWrapper>,
     );
-    const select = getByLabelText(/send notification to/i);
+    const select = getByTestId('select-receiver');
     expect(select.textContent).toBe('test_receiver');
   });
 
@@ -91,16 +91,15 @@ describe('Receiver select', () => {
         },
       ],
     });
-    const {getByTestId, getByLabelText, getByText} = render(
+    const {getByTestId} = render(
       <AlarmsWrapper>
         <AddEditRule {...commonProps} />
       </AlarmsWrapper>,
     );
+    const selectReceiver = getByTestId('select-receiver-input');
+
     act(() => {
-      fireEvent.mouseDown(getByLabelText(/send notification to/i));
-    });
-    act(() => {
-      fireEvent.click(getByText('new_receiver'));
+      fireEvent.change(selectReceiver, {target: {value: 'new_receiver'}});
     });
 
     const receiverInput = assertType(
@@ -122,17 +121,16 @@ describe('Receiver select', () => {
 
     const editRouteTreeMock = jest.spyOn(apiUtil, 'editRouteTree');
 
-    const {getByLabelText, getByText, getByTestId} = render(
+    const {getByTestId} = render(
       <AlarmsWrapper>
         <AddEditRule {...commonProps} />
       </AlarmsWrapper>,
     );
 
+    const selectReceiver = getByTestId('select-receiver-input');
+
     act(() => {
-      fireEvent.mouseDown(getByLabelText(/send notification to/i));
-    });
-    act(() => {
-      fireEvent.click(getByText('test_receiver'));
+      fireEvent.change(selectReceiver, {target: {value: 'test_receiver'}});
     });
     await act(async () => {
       fireEvent.submit(getByTestId('editor-form'));
@@ -171,18 +169,17 @@ describe('Receiver select', () => {
 
     const editRouteTreeMock = jest.spyOn(apiUtil, 'editRouteTree');
 
-    const {getByLabelText, getByText, getByTestId} = render(
+    const {getByTestId} = render(
       <AlarmsWrapper>
         <AddEditRule {...commonProps} />
       </AlarmsWrapper>,
       {baseElement: nullthrows(document.body)},
     );
 
+    const selectReceiver = getByTestId('select-receiver-input');
+
     act(() => {
-      fireEvent.mouseDown(getByLabelText(/send notification to/i));
-    });
-    await act(async () => {
-      fireEvent.click(getByText('new_receiver'));
+      fireEvent.change(selectReceiver, {target: {value: 'new_receiver'}});
     });
     await act(async () => {
       fireEvent.submit(getByTestId('editor-form'));
@@ -220,18 +217,18 @@ describe('Receiver select', () => {
       ],
     });
     const editRouteTreeMock = jest.spyOn(apiUtil, 'editRouteTree');
-    const {getByLabelText, getByText, getByTestId} = render(
+    const {getByTestId} = render(
       <AlarmsWrapper>
         <AddEditRule {...commonProps} />
       </AlarmsWrapper>,
       {baseElement: nullthrows(document.body)},
     );
 
+    const selectReceiver = getByTestId('select-receiver-input');
+
     act(() => {
-      fireEvent.mouseDown(getByLabelText(/send notification to/i));
-    });
-    await act(async () => {
-      fireEvent.click(getByText('None'));
+      // select option None
+      fireEvent.change(selectReceiver, {target: {value: ''}});
     });
     await act(async () => {
       fireEvent.submit(getByTestId('editor-form'));

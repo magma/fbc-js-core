@@ -49,6 +49,7 @@ export default function SelectReceiver({
     <Select
       {...fieldProps}
       id="select-receiver"
+      data-testid="select-receiver"
       onChange={handleChange}
       defaultValue="Select Team"
       inputProps={{'data-testid': 'select-receiver-input'}}

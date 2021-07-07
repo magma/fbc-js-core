@@ -31,7 +31,6 @@ describe('Basics', () => {
     expect(getByTestId('alert-details-pane')).toBeInTheDocument();
     expect(getByTestId('metric-alert-viewer')).toBeInTheDocument();
     expect(getByText('<<test alert>>')).toBeInTheDocument();
-    expect(getByText(/labels/i)).toBeInTheDocument();
   });
 
   test('clicking the close button invokes onclose callback', () => {

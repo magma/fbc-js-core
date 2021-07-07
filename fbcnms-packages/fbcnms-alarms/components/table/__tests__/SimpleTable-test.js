@@ -96,7 +96,7 @@ test('if onActionsClick is not passed, no actions menu is rendered', () => {
 
 test('if onActionsClick is passed, actions menu is rendered', () => {
   const actionsMenuMock = jest.fn();
-  const {getByLabelText, getByText} = render(
+  const {getByLabelText, getByTestId} = render(
     <Wrapper>
       <SimpleTable
         columnStruct={mockColumns()}
@@ -113,7 +113,7 @@ test('if onActionsClick is passed, actions menu is rendered', () => {
   // clicking the actions menu button should invoke onActionsClick
   expect(actionsMenuMock).toHaveBeenCalled();
   // expect the actions column to exist
-  expect(getByText('actions')).toBeInTheDocument();
+  expect(getByTestId('action-menu')).toBeInTheDocument();
 });
 
 describe('column renderers', () => {

@@ -222,6 +222,7 @@ function ConfigSection({
                 <IconButton
                   edge="end"
                   onClick={onAddConfigClicked}
+                  data-testid={`add-${title.replace(/\s/g, '')}`}
                   aria-label="add new receiver configuration">
                   <AddCircleOutlineIcon color="primary" />
                 </IconButton>

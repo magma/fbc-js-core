@@ -28,6 +28,7 @@ export default function SlackConfigEditor({
           <Grid item>
             <TextField
               required
+              data-testid="slack-config-editor"
               id="apiurl"
               label="Webhook URL"
               placeholder="Ex: https://hooks.slack.com/services/a/b"
@@ -52,7 +53,6 @@ export default function SlackConfigEditor({
           </Grid>
         </>
       }
-      data-testid="slack-config-editor"
     />
   );
 }
