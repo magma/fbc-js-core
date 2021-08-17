@@ -175,11 +175,6 @@ workflows:
           package_name: fbcnms/projects
           <<: *onlymaster
       - deploy:
-          name: deploy-fbcnms-magma-api
-          package_dir: fbcnms-magma-api
-          package_name: fbcnms/magma-api
-          <<: *onlymaster
-      - deploy:
           name: deploy-fbcnms-mobileapp
           package_dir: fbcnms-mobileapp
           package_name: fbcnms/mobileapp
