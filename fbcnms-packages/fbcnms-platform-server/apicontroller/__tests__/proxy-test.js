@@ -8,6 +8,8 @@
  * @format
  */
 
+// TODO(andreilee): Remove this file
+
 import {networkIdFilter, networksResponseDecorator} from '../routes';
 
 // $FlowIgnore Ignoring error for tests.

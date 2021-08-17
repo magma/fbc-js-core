@@ -12,7 +12,6 @@ import type {ExpressResponse} from 'express';
 import type {FBCNMSRequest} from '@fbcnms/auth/access';
 import type {FeatureID} from '@fbcnms/types/features';
 
-import MagmaV1API from '../magma';
 import Sequelize from 'sequelize';
 import asyncHandler from '@fbcnms/util/asyncHandler';
 import express from 'express';
@@ -217,14 +216,6 @@ router.delete(
       individualHooks: true,
     });
     res.status(200).send({success: true});
-  }),
-);
-
-router.get(
-  '/networks/async',
-  asyncHandler(async (_: FBCNMSRequest, res) => {
-    const networks = await MagmaV1API.getNetworks();
-    res.status(200).send(networks);
   }),
 );
 
