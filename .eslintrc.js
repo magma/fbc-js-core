@@ -86,7 +86,6 @@ module.exports.overrides = [
       'fbcnms-packages/fbcnms-babel-register/**/*.js',
       'fbcnms-packages/fbcnms-express-middleware/**/*.js',
       'fbcnms-packages/fbcnms-logging/**/*.js',
-      'fbcnms-packages/fbcnms-magma-api/**/*.js',
       'fbcnms-packages/fbcnms-platform-server/**/*.js',
       'fbcnms-packages/fbcnms-relay/**/*.js',
       'fbcnms-packages/fbcnms-sequelize-models/**/*.js',
