@@ -8,6 +8,8 @@
  * @format
  */
 
+// TODO(andreilee): Remove this file, only used for tests
+
 import type {ExpressResponse} from 'express';
 import type {FBCNMSRequest} from '@fbcnms/auth/access';
 
