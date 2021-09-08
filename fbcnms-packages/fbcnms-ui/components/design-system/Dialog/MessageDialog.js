@@ -12,7 +12,6 @@ import * as React from 'react';
 import BaseDialog from './BaseDialog';
 import Button from '../Button';
 import Checkbox from '../Checkbox/Checkbox';
-import Strings from '@fbcnms/strings/Strings';
 import Text from '../Text';
 import {makeStyles} from '@material-ui/styles';
 import {useEffect, useState} from 'react';
@@ -77,8 +76,8 @@ const MessageDialog = ({
   message,
   onClose,
   verificationCheckbox,
-  cancelLabel = Strings.common.cancelButton,
-  confirmLabel = Strings.common.okButton,
+  cancelLabel = 'Cancel',
+  confirmLabel = 'OK',
   onCancel,
   onConfirm,
   hidden,
