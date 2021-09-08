@@ -105,11 +105,6 @@ workflows:
   deploy:
     jobs:
       - deploy:
-          name: deploy-fbcnms-strings
-          package_dir: fbcnms-strings
-          package_name: fbcnms/strings
-          <<: *onlymaster
-      - deploy:
           name: deploy-fbcnms-util
           package_dir: fbcnms-util
           package_name: fbcnms/util
