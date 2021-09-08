@@ -120,11 +120,6 @@ workflows:
           package_name: fbcnms/ui
           <<: *onlymaster
       - deploy:
-          name: deploy-fbcnms-relay
-          package_dir: fbcnms-relay
-          package_name: fbcnms/relay
-          <<: *onlymaster
-      - deploy:
           name: deploy-fbcnms-babel-register
           package_dir: fbcnms-babel-register
           package_name: fbcnms/babel-register
