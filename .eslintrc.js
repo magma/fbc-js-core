@@ -101,14 +101,6 @@ module.exports.overrides = [
       'no-console': 'off',
     },
   },
-  {
-    files: ['**/tgnms/**/*.js'],
-    rules: {
-      // tgnms doesn't want this because there's too many errors
-      'flowtype/no-weak-types': 'off',
-      'flowtype/require-valid-file-annotation': 'off',
-    },
-  },
 ];
 module.exports.settings = {
   react: {
