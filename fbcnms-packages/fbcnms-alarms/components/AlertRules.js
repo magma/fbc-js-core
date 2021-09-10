@@ -11,8 +11,7 @@ import * as React from 'react';
 import AddEditRule from './rules/AddEditRule';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
+import SeverityIndicator from './severity/SeverityIndicator';
 import SimpleTable from './table/SimpleTable';
 import TableActionDialog from './table/TableActionDialog';
 import TableAddButton from './table/TableAddButton';
@@ -24,7 +23,6 @@ import {useAlarmContext} from './AlarmContext';
 import {useLoadRules} from './hooks';
 import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
-import type {ColumnData} from './table/SimpleTable';
 import type {GenericRule} from './rules/RuleInterface';
 
 const useStyles = makeStyles(theme => ({
@@ -58,8 +56,6 @@ export default function AlertRules<TRuleUnion>() {
   const [lastRefreshTime, setLastRefreshTime] = React.useState(
     new Date().getTime().toString(),
   );
-  const menuAnchorEl = React.useRef<?HTMLElement>(null);
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [
     selectedRow,
     setSelectedRow,
@@ -70,57 +66,11 @@ export default function AlertRules<TRuleUnion>() {
   const [matchingAlertsCount, setMatchingAlertsCount] = React.useState<?number>(
     null,
   );
-
   const {rules, isLoading} = useLoadRules({
     ruleMap,
     lastRefreshTime,
   });
 
-  const columnStruct = React.useMemo<
-    Array<ColumnData<GenericRule<TRuleUnion>>>,
-  >(
-    () => [
-      {
-        title: 'name',
-        getValue: x => x.name,
-      },
-      {
-        title: 'severity',
-        getValue: rule => rule.severity,
-        render: 'severity',
-      },
-      {
-        title: 'fire alert when',
-        getValue: rule => {
-          try {
-            const exp = Parse(rule.expression);
-            if (exp) {
-              const metricName = exp.lh.selectorName?.toUpperCase() || '';
-              const operator = exp.operator?.toString() || '';
-              const value = exp.rh.value?.toString() || '';
-              return `${metricName} ${operator} ${value} for ${rule.period}`;
-            }
-          } catch {}
-
-          return 'error';
-        },
-      },
-      {
-        title: 'description',
-        getValue: rule => rule.description,
-      },
-    ],
-    [],
-  );
-
-  const handleActionsMenuOpen = React.useCallback(
-    (row: GenericRule<TRuleUnion>, eventTarget: HTMLElement) => {
-      setSelectedRow(row);
-      menuAnchorEl.current = eventTarget;
-      setIsMenuOpen(true);
-    },
-    [menuAnchorEl, setIsMenuOpen, setSelectedRow],
-  );
   const loadMatchingAlerts = React.useCallback(async () => {
     try {
       // only show matching alerts for prometheus rules for now
@@ -135,11 +85,6 @@ export default function AlertRules<TRuleUnion>() {
       snackbars.error('Could not load matching alerts for rule');
     }
   }, [selectedRow, apiUtil, match.params.networkId, snackbars]);
-  const handleActionsMenuClose = React.useCallback(() => {
-    setSelectedRow(null);
-    menuAnchorEl.current = null;
-    setIsMenuOpen(false);
-  }, [menuAnchorEl, setIsMenuOpen, setSelectedRow]);
   const handleEdit = React.useCallback(() => {
     setIsAddEditAlert(true);
     setIsNewAlert(false);
@@ -168,7 +113,6 @@ export default function AlertRules<TRuleUnion>() {
       );
     } finally {
       setLastRefreshTime(new Date().toLocaleString());
-      setIsMenuOpen(false);
     }
   }, [match.params.networkId, ruleMap, selectedRow, snackbars]);
 
@@ -186,7 +130,6 @@ export default function AlertRules<TRuleUnion>() {
         onExit={() => {
           setIsAddEditAlert(false);
           setLastRefreshTime(new Date().toLocaleString());
-          handleActionsMenuClose();
         }}
       />
     );
@@ -195,23 +138,65 @@ export default function AlertRules<TRuleUnion>() {
   return (
     <Grid className={classes.root}>
       <SimpleTable
-        columnStruct={columnStruct}
+        onRowClick={row => setSelectedRow(row)}
+        columnStruct={[
+          {
+            title: 'Name',
+            field: 'name',
+          },
+          {
+            title: 'Severity',
+            field: 'severity',
+            render: currRow => (
+              <SeverityIndicator severity={currRow.severity} />
+            ),
+          },
+          {
+            title: 'Fire Alert When',
+            field: 'fireAlertWhen',
+            render: currRow => {
+              try {
+                const exp = Parse(currRow.expression);
+                if (exp) {
+                  const metricName = exp.lh.selectorName?.toUpperCase() || '';
+                  const operator = exp.operator?.toString() || '';
+                  const value = exp.rh.value?.toString() || '';
+                  return `${metricName} ${operator} ${value} for ${currRow.period}`;
+                }
+              } catch {}
+              return 'error';
+            },
+          },
+          {
+            title: 'Description',
+            field: 'description',
+          },
+        ]}
         tableData={rules || []}
-        onActionsClick={handleActionsMenuOpen}
+        dataTestId="alert-rules"
+        menuItems={[
+          {
+            name: 'View',
+            handleFunc: () => handleView(),
+          },
+          {
+            name: 'Edit',
+            handleFunc: () => handleEdit(),
+          },
+          {
+            name: 'Delete',
+            handleFunc: () => {
+              handleDelete();
+            },
+          },
+        ]}
       />
       {isLoading && (
         <div className={classes.loading}>
           <CircularProgress />
         </div>
       )}
-      <Menu
-        anchorEl={menuAnchorEl.current}
-        open={isMenuOpen}
-        onClose={handleActionsMenuClose}>
-        <MenuItem onClick={handleEdit}>Edit</MenuItem>
-        <MenuItem onClick={handleView}>View</MenuItem>
-        <MenuItem onClick={handleDelete}>Delete</MenuItem>
-      </Menu>
+
       {selectedRow && (
         <TableActionDialog
           open={isViewAlertModalOpen}
