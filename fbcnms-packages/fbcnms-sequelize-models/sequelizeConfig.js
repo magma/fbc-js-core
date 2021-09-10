@@ -17,9 +17,6 @@ const MYSQL_USER = process.env.MYSQL_USER || 'root';
 const MYSQL_PASS = process.env.MYSQL_PASS || '';
 const MYSQL_DB = process.env.MYSQL_DB || 'cxl';
 const MYSQL_DIALECT = process.env.MYSQL_DIALECT || 'mysql';
-const CA_FILE = process.env.CA_FILE;
-const KEY_FILE = process.env.KEY_FILE;
-const CERT_FILE = process.env.CERT_FILE;
 
 const logger = require('@fbcnms/logging').getLogger(module);
 
