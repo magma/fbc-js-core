@@ -31,7 +31,7 @@ let dialectOptions = {};
 
 if (process.env.CA_FILE) {
   try {
-    CAcert = fs.readFileSync(CA_FILE);
+    CAcert = fs.readFileSync(process.env.CA_FILE);
     ssl_required = true;
   } catch (e) {
     console.warn('cannot read ca cert file', e);
@@ -40,7 +40,7 @@ if (process.env.CA_FILE) {
 
 if (process.env.KEY_FILE) {
   try {
-    Ckey = fs.readFileSync(KEY_FILE);
+    Ckey = fs.readFileSync(process.env.KEY_FILE);
     ssl_required = true;
   } catch (e) {
     console.warn('cannot read key file', e);
@@ -49,7 +49,7 @@ if (process.env.KEY_FILE) {
 
 if (process.env.CERT_FILE) {
   try {
-    Ccert = fs.readFileSync(CERT_FILE);
+    Ccert = fs.readFileSync(process.env.CERT_FILE);
     ssl_required = true;
   } catch (e) {
     console.warn('cannot read cert file', e);
