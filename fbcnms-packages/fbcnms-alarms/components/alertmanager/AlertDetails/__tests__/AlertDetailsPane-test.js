@@ -7,19 +7,15 @@
  * @flow strict-local
  * @format
  */
-import 'jest-dom/extend-expect';
+
 import * as React from 'react';
 import AlertDetailsPane from '../AlertDetailsPane';
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {alarmTestUtil} from '../../../../test/testHelpers';
 import {mockAlert, mockRuleInterface} from '../../../../test/testData';
 import type {AlertViewerProps} from '../../../rules/RuleInterface';
 
-afterEach(() => {
-  cleanup();
-});
-
-const {AlarmsWrapper} = alarmTestUtil();
+const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 const commonProps = {
   alert: mockAlert({labels: {alertname: '<<test alert>>'}}),
   onClose: jest.fn(),
@@ -35,7 +31,6 @@ describe('Basics', () => {
     expect(getByTestId('alert-details-pane')).toBeInTheDocument();
     expect(getByTestId('metric-alert-viewer')).toBeInTheDocument();
     expect(getByText('<<test alert>>')).toBeInTheDocument();
-    expect(getByText(/labels/i)).toBeInTheDocument();
   });
 
   test('clicking the close button invokes onclose callback', () => {
@@ -74,6 +69,20 @@ describe('Basics', () => {
     expect(getByText(/testAnnotation/i)).toBeInTheDocument();
     expect(getByText(/testValue/i)).toBeInTheDocument();
   });
+});
+
+test('shows troubleshooting link', () => {
+  const alert = mockAlert({labels: {testLabel: 'testValue'}});
+  jest.spyOn(apiUtil, 'getTroubleshootingLink').mockReturnValue({
+    link: 'www.example.com',
+    title: 'View troubleshooting documentation',
+  });
+  const {getByText} = render(
+    <AlarmsWrapper>
+      <AlertDetailsPane {...commonProps} alert={alert} />
+    </AlarmsWrapper>,
+  );
+  expect(getByText(/View troubleshooting documentation/i)).toBeInTheDocument();
 });
 
 describe('Alert type selection', () => {

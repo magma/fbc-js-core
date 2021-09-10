@@ -2495,9 +2495,6 @@ declare module "@material-ui/core/styles" {
 
   declare module.exports: {
     MuiThemeProvider: $Exports<"@material-ui/core/styles/MuiThemeProvider">,
-    makeStyles: <Props, Stl: Style<Props, string>>(
-      Theme => Stl,
-    ) => StyleHookFn<Props, Stl>,
     withStyles: $Exports<"@material-ui/core/styles/withStyles">,
     withTheme: $Exports<"@material-ui/core/styles/withTheme">,
     createGenerateClassName: $Exports<"@material-ui/core/styles/createGenerateClassName">,
@@ -3957,9 +3954,6 @@ declare module "@material-ui/core/styles/transitions.js" {
 declare module "@material-ui/core/styles/withStyles.js" {
   declare module.exports: $Exports<"@material-ui/core/styles/withStyles">;
 }
-declare module "@material-ui/core/styles/makeStyles.js" {
-  declare module.exports: $Exports<"@material-ui/core/styles/makeStyles">;
-}
 declare module "@material-ui/core/styles/withTheme.js" {
   declare module.exports: $Exports<"@material-ui/core/styles/withTheme">;
 }
@@ -4354,9 +4348,6 @@ declare module "@material-ui/core" {
   >;
   declare export var withStyles: $Exports<
     "@material-ui/core/styles/withStyles"
-  >;
-  declare export var makeStyles: $Exports<
-    "@material-ui/core/styles/makeStyles"
   >;
   declare export var withTheme: $Exports<"@material-ui/core/styles/withTheme">;
   declare export var createMuiTheme: $Exports<

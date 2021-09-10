@@ -7,33 +7,27 @@
  * @flow
  * @format
  */
-import 'jest-dom/extend-expect';
-import 'jest-dom/extend-expect';
+
 import * as React from 'react';
 import PrometheusEditor from '../PrometheusEditor';
 import {alarmTestUtil} from '../../../../test/testHelpers';
-import {cleanup, render} from '@testing-library/react';
 import {parseTimeString} from '../PrometheusEditor';
+import {render} from '@testing-library/react';
 
 import type {AlertConfig} from '../../../AlarmAPIType';
 import type {GenericRule} from '../../RuleInterface';
 
-jest.mock('../../../../hooks/useSnackbar');
-jest.mock('../../../../hooks/useRouter');
+jest.mock('@fbcnms/ui/hooks/useSnackbar');
+jest.mock('@fbcnms/ui/hooks/useRouter');
 
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
-
-const {AlarmsWrapper} = alarmTestUtil();
+const {AlarmsWrapper, apiUtil} = alarmTestUtil();
 
 const enqueueSnackbarMock = jest.fn();
 jest
-  .spyOn(require('../../../../hooks/useSnackbar'), 'useEnqueueSnackbar')
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useEnqueueSnackbar')
   .mockReturnValue(enqueueSnackbarMock);
 jest
-  .spyOn(require('../../../../hooks/useRouter'), 'default')
+  .spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});
 
 // TextField select is difficult to test so replace it with an Input
@@ -55,6 +49,7 @@ const commonProps = {
 };
 
 test('editing a threshold alert opens the PrometheusEditor with the threshold expression editor enabled', async () => {
+  jest.spyOn(apiUtil, 'getMetricSeries').mockResolvedValue([]);
   const testThresholdRule: GenericRule<AlertConfig> = {
     severity: '',
     ruleType: '',

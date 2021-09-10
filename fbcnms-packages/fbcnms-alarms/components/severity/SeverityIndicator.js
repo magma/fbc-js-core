@@ -8,10 +8,11 @@
  * @format
  */
 import * as React from 'react';
+import Chip from '@material-ui/core/Chip';
 import Typography from '@material-ui/core/Typography';
 import classnames from 'classnames';
 import {SEVERITY} from './Severity';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 
 const useStyles = makeStyles(theme => ({
   // the circle
@@ -20,6 +21,13 @@ const useStyles = makeStyles(theme => ({
     height: '10px',
     width: '10px',
     borderRadius: '50%',
+  },
+  chip: {
+    color: 'white',
+    textTransform: 'capitalize',
+    padding: '5px',
+    fontWeight: 600,
+    marginBottom: '20px',
   },
   text: {
     marginLeft: theme.spacing(1),
@@ -50,9 +58,12 @@ const useStyles = makeStyles(theme => ({
 
 type Props = {
   severity: string,
+  // display a chip instead of a circle
+  chip?: boolean,
 };
 
-export default function SeverityIndicator({severity}: Props) {
+export default function SeverityIndicator(props: Props) {
+  const severity = props.severity;
   const value =
     severity && severity.trim() !== '' ? severity.toLowerCase() : 'unknown';
   const classes = useStyles();
@@ -62,10 +73,21 @@ export default function SeverityIndicator({severity}: Props) {
     [value, classes],
   );
 
+  const colorChipClassname = React.useMemo(
+    () => classnames(classes.chip, classes[value] ?? classes.unknown),
+    [value, classes],
+  );
+  const chip = props.chip ?? false;
   return (
-    <Typography noWrap>
-      <span className={colorClassname} />
-      <span className={classes.text}>{value}</span>
-    </Typography>
+    <>
+      {!chip ? (
+        <Typography noWrap>
+          <span className={colorClassname} />
+          <span className={classes.text}>{value}</span>
+        </Typography>
+      ) : (
+        <Chip label={value} className={colorChipClassname} />
+      )}
+    </>
   );
 }

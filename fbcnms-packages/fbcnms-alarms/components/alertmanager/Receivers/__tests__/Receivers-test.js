@@ -7,12 +7,11 @@
  * @flow
  * @format
  */
-import 'jest-dom/extend-expect';
+
 import * as React from 'react';
 import Receivers from '../Receivers';
 import {
   act,
-  cleanup,
   fireEvent,
   render,
   wait,
@@ -22,16 +21,11 @@ import {alarmTestUtil, useMagmaAPIMock} from '../../../../test/testHelpers';
 
 const enqueueSnackbarMock = jest.fn();
 jest
-  .spyOn(require('../../../../hooks/useSnackbar'), 'useEnqueueSnackbar')
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useEnqueueSnackbar')
   .mockReturnValue(enqueueSnackbarMock);
 jest
-  .spyOn(require('../../../../hooks/useRouter'), 'default')
+  .spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});
-
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
 
 const {AlarmsWrapper} = alarmTestUtil();
 
@@ -59,18 +53,18 @@ test('clicking the View button on a row shows the view dialog', async () => {
       },
     ],
   });
-  const {getByLabelText, getByText, queryByText} = render(
+  const {getByText, getAllByText, queryByText, getAllByTitle} = render(
     <AlarmsWrapper>
       <Receivers />
     </AlarmsWrapper>,
   );
-  const actionMenu = getByLabelText(/Action Menu/i);
-  expect(actionMenu).toBeInTheDocument();
+  const actionMenu = getAllByTitle('Actions');
+  expect(actionMenu[0]).toBeInTheDocument();
   act(() => {
-    fireEvent.click(actionMenu);
+    fireEvent.click(actionMenu[0]);
   });
   act(() => {
-    fireEvent.click(getByText('View'));
+    fireEvent.click(getAllByText('View')[0]);
   });
   // clicking View should open the dialog
   await waitForElement(() => getByText(/View Receiver/i));
@@ -101,20 +95,20 @@ test('clicking edit button should show AddEditReceiver in edit mode', () => {
       },
     ],
   });
-  const {getByLabelText, getByText, getByTestId, queryByTestId} = render(
+  const {getAllByText, getByTestId, queryByTestId, getAllByTitle} = render(
     <AlarmsWrapper>
       <Receivers />
     </AlarmsWrapper>,
   );
 
-  const actionMenu = getByLabelText(/Action Menu/i);
-  expect(actionMenu).toBeInTheDocument();
+  const actionMenu = getAllByTitle('Actions');
+  expect(actionMenu[0]).toBeInTheDocument();
   act(() => {
-    fireEvent.click(actionMenu);
+    fireEvent.click(actionMenu[0]);
   });
   expect(queryByTestId('add-edit-receiver')).not.toBeInTheDocument();
   act(() => {
-    fireEvent.click(getByText('Edit'));
+    fireEvent.click(getAllByText('Edit')[0]);
   });
   expect(getByTestId('add-edit-receiver')).toBeInTheDocument();
 });

@@ -7,17 +7,16 @@
  * @flow strict-local
  * @format
  */
-
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
-import SimpleTable, {toLabels} from '../table/SimpleTable';
+import SimpleTable, {LabelsCell, toLabels} from '../table/SimpleTable';
 import TableActionDialog from '../table/TableActionDialog';
-import useRouter from '../../hooks/useRouter';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
-import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
+import {useNetworkId} from '../../components/hooks';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 import {useState} from 'react';
 
 const useStyles = makeStyles(() => ({
@@ -28,7 +27,6 @@ const useStyles = makeStyles(() => ({
     justifyContent: 'center',
   },
 }));
-
 export default function Routes() {
   const {apiUtil} = useAlarmContext();
   const [menuAnchorEl, setMenuAnchorEl] = useState<?HTMLElement>(null);
@@ -38,26 +36,25 @@ export default function Routes() {
     new Date().toLocaleString(),
   );
   const classes = useStyles();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
+  const snackbars = useSnackbars();
 
   const onDialogAction = args => {
     setShowDialog(args);
     setMenuAnchorEl(null);
   };
 
+  const networkId = useNetworkId();
   const {isLoading, error, response} = apiUtil.useAlarmsApi(
     apiUtil.getRouteTree,
-    {networkId: match.params.networkId},
+    {networkId},
     lastRefreshTime,
   );
 
   if (error) {
-    enqueueSnackbar(
+    snackbars.error(
       `Unable to load receivers: ${
         error.response ? error.response.data.message : error.message
       }`,
-      {variant: 'error'},
     );
   }
 
@@ -66,22 +63,29 @@ export default function Routes() {
   return (
     <>
       <SimpleTable
-        tableData={routesList}
-        onActionsClick={(alert, target) => {
-          setMenuAnchorEl(target);
-          setCurrentRow(alert);
-        }}
+        onRowClick={row => setCurrentRow(row)}
         columnStruct={[
-          {title: 'name', getValue: row => row.receiver},
+          {title: 'Name', field: 'receiver'},
           {
-            title: 'group by',
-            getValue: row => row.group_by || [],
-            render: 'list',
+            title: 'Group By',
+            field: 'group_by',
+            render: row => row.group_by?.join(','),
           },
           {
-            title: 'match',
-            getValue: row => (row.match ? toLabels(row.match) : {}),
-            render: 'labels',
+            title: 'Match',
+            field: 'match',
+            render: row => {
+              const labels = toLabels(row.match);
+              return <LabelsCell value={labels} />;
+            },
+          },
+        ]}
+        tableData={routesList || []}
+        dataTestId="routes"
+        menuItems={[
+          {
+            name: 'View',
+            handleFunc: () => onDialogAction('view'),
           },
         ]}
       />

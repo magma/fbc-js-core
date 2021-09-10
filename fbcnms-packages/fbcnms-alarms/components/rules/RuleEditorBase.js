@@ -12,7 +12,6 @@
  */
 
 import * as React from 'react';
-import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
@@ -80,19 +79,44 @@ export default function RuleEditorBase({
   return (
     <Editor
       {...props}
-      title={
-        formState?.name == null || formState?.name.trim() === ''
-          ? 'New Alert Rule'
-          : formState.name
-      }
-      description="Configure rules to fire alerts"
+      title="Add Alert Rule"
+      description="Create a new rule to be alerted of important changes in the network"
       isNew={isNew}
       onSave={handleSave}>
       <Grid container item spacing={4}>
         <Grid container direction="column" item xs={7} spacing={4}>
           <Grid item>
             <Card>
-              <CardHeader title="Details" />
+              <CardHeader title="Summary" />
+              <CardContent>
+                <Grid item>
+                  <TextField
+                    id="rulename"
+                    disabled={!isNew}
+                    required
+                    label="Rule Name"
+                    placeholder="Ex: Link down"
+                    fullWidth
+                    value={formState.name}
+                    onChange={handleInputChange(val => ({name: val}))}
+                  />
+                </Grid>
+                <Grid item>
+                  <TextField
+                    disabled={!isNew}
+                    label="Description"
+                    placeholder="Ex: The link is down"
+                    fullWidth
+                    value={formState.description}
+                    onChange={handleInputChange(val => ({description: val}))}
+                  />
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item>
+            <Card>
+              <CardHeader title="Conditions" />
               <CardContent>
                 <Grid container direction="column" spacing={4}>
                   {isNew && (
@@ -109,35 +133,6 @@ export default function RuleEditorBase({
               </CardContent>
             </Card>
           </Grid>
-          <Grid item>
-            <Card>
-              <CardHeader title="Summary" />
-              <CardContent>
-                <Grid item>
-                  <TextField
-                    disabled={!isNew}
-                    required
-                    label="Rule Name"
-                    placeholder="Ex: Link down"
-                    fullWidth
-                    value={formState.name}
-                    onChange={handleInputChange(val => ({name: val}))}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    disabled={!isNew}
-                    required
-                    label="Description"
-                    placeholder="Ex: The link is down"
-                    fullWidth
-                    value={formState.description}
-                    onChange={handleInputChange(val => ({description: val}))}
-                  />
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
         <Grid container direction="column" item spacing={4} xs={5}>
           <Grid item>
@@ -146,13 +141,14 @@ export default function RuleEditorBase({
                 title={
                   <>
                     <Typography variant="h5" gutterBottom>
-                      Notify
+                      Notifications
                     </Typography>
                     <Typography
                       color="textSecondary"
                       gutterBottom
                       variant="body2">
-                      Team or service to notify when this alert fires
+                      Select who will be contacted when this rule triggers an
+                      alert
                     </Typography>
                   </>
                 }
@@ -160,17 +156,12 @@ export default function RuleEditorBase({
               <CardContent>
                 <Grid container direction="column" spacing={2}>
                   <Grid item>
-                    <InputLabel>Team</InputLabel>
+                    <InputLabel>Audience</InputLabel>
                     <SelectReceiver
                       fullWidth
                       receiver={receiver}
                       onChange={setReceiver}
                     />
-                  </Grid>
-                  <Grid item>
-                    <Button color="primary" size="small">
-                      Create new team
-                    </Button>
                   </Grid>
                 </Grid>
               </CardContent>

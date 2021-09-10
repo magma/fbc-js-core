@@ -7,15 +7,14 @@
  * @flow
  * @format
  */
-import 'jest-dom/extend-expect';
+
 import * as PromQL from '../../../prometheus/PromQL';
-import {cleanup} from '@testing-library/react';
+
 import {thresholdToPromQL} from '../ToggleableExpressionEditor';
 
 import type {ThresholdExpression} from '../ToggleableExpressionEditor';
 
 afterEach(() => {
-  cleanup();
   jest.resetAllMocks();
 });
 

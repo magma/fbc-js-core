@@ -20,6 +20,7 @@ export type AlarmContext = {|
   filterLabels?: (labels: Labels) => Labels,
   ruleMap: RuleInterfaceMap<*>,
   getAlertType?: ?GetAlertType,
+  getNetworkId?: () => string,
   // feature flags
   thresholdEditorEnabled?: boolean,
   alertManagerGlobalConfigEnabled?: boolean,
@@ -42,6 +43,7 @@ const emptyApiUtil = {
     isLoading: false,
   }),
   viewFiringAlerts: (..._) => Promise.reject('not implemented'),
+  getTroubleshootingLink: (..._) => Promise.reject('not implemented'),
   viewMatchingAlerts: (..._) => Promise.reject('not implemented'),
   createAlertRule: (..._) => Promise.reject('not implemented'),
   editAlertRule: (..._) => Promise.reject('not implemented'),
@@ -54,6 +56,7 @@ const emptyApiUtil = {
   deleteReceiver: (..._) => Promise.reject('not implemented'),
   getRouteTree: (..._) => Promise.reject('not implemented'),
   editRouteTree: (..._) => Promise.reject('not implemented'),
+  getMetricNames: (..._) => Promise.reject('not implemented'),
   getMetricSeries: (..._) => Promise.reject('not implemented'),
   getGlobalConfig: _ => Promise.reject('not implemented'),
   editGlobalConfig: _ => Promise.reject('not implemented'),

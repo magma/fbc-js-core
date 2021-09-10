@@ -10,7 +10,7 @@
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
 import RuleContext from './RuleContext';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useState} from 'react';
 
@@ -42,14 +42,22 @@ export default function AddEditRule<TRuleUnion>(props: Props<TRuleUnion>) {
     rule?.ruleType || props.defaultRuleType || 'prometheus',
   );
 
-  const {RuleEditor} = ruleMap[selectedRuleType];
+  // null out in-progress rule so next editor doesnt see an incompatible schema
+  const selectRuleType = React.useCallback(
+    type => {
+      setRule(null);
+      return setSelectedRuleType(type);
+    },
+    [setRule, setSelectedRuleType],
+  );
 
+  const {RuleEditor} = ruleMap[selectedRuleType];
   return (
     <RuleContext.Provider
       value={{
         ruleMap: ruleMap,
         ruleType: selectedRuleType,
-        selectRuleType: setSelectedRuleType,
+        selectRuleType: selectRuleType,
       }}>
       <Grid
         className={classes.gridContainer}

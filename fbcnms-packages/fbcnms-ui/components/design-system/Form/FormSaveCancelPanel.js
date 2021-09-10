@@ -11,7 +11,6 @@
 import Button from '@fbcnms/ui/components/design-system/Button';
 import FormAction from './FormAction';
 import React from 'react';
-import Strings from '@fbcnms/strings/Strings';
 import classNames from 'classnames';
 import {makeStyles} from '@material-ui/styles';
 
@@ -59,7 +58,7 @@ const FormSaveCancelPanel = (props: Props) => {
           )}
           onClick={onCancel}
           skin="regular">
-          {captions?.cancelButton || Strings.common.cancelButton}
+          {captions?.cancelButton || 'Cancel'}
         </Button>
       </FormAction>
       <FormAction
@@ -67,7 +66,7 @@ const FormSaveCancelPanel = (props: Props) => {
         disabled={isDisabled}
         tooltip={isDisabled ? disabledMessage : undefined}>
         <Button className={propsClasses?.saveButton} onClick={onSave}>
-          {captions?.saveButton || Strings.common.saveButton}
+          {captions?.saveButton || 'Save'}
         </Button>
       </FormAction>
     </div>

@@ -7,26 +7,23 @@
  * @flow
  * @format
  */
-
-import 'jest-dom/extend-expect';
-import {cleanup} from '@testing-library/react';
+import * as React from 'react';
+import {AlarmsTestWrapper, alarmTestUtil} from '../../test/testHelpers';
 import {act as hooksAct, renderHook} from '@testing-library/react-hooks';
 import {mockRuleInterface} from '../../test/testData';
-import {useLoadRules} from '../hooks';
+import {useLoadRules, useNetworkId} from '../hooks';
 import type {GenericRule} from '../rules/RuleInterface';
+import type {RenderResult} from '@testing-library/react-hooks';
 
 jest.useFakeTimers();
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
 
+const {AlarmsWrapper} = alarmTestUtil();
 const enqueueSnackbarMock = jest.fn();
 jest
-  .spyOn(require('../../hooks/useSnackbar'), 'useEnqueueSnackbar')
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useEnqueueSnackbar')
   .mockReturnValue(enqueueSnackbarMock);
 
-jest.spyOn(require('../../hooks/useRouter'), 'default').mockReturnValue({
+jest.spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default').mockReturnValue({
   match: {
     params: {
       networkId: 'test',
@@ -92,6 +89,31 @@ describe('useLoadRules hook', () => {
   });
 });
 
+describe('useNetworkId hook', () => {
+  it('returns match.params.networkId by default', () => {
+    const {result} = renderHook(() => useNetworkId(), {
+      wrapper: ({children}) => (
+        <AlarmsTestWrapper>
+          <AlarmsWrapper>{children}</AlarmsWrapper>
+        </AlarmsTestWrapper>
+      ),
+    });
+    expect(result.current).toBe('test');
+  });
+  it('returns AlarmsContext.getNetworkId if provided', () => {
+    const {result} = renderHook(() => useNetworkId(), {
+      wrapper: ({children}) => (
+        <AlarmsTestWrapper>
+          <AlarmsWrapper getNetworkId={() => 'getnetworkid-test'}>
+            {children}
+          </AlarmsWrapper>
+        </AlarmsTestWrapper>
+      ),
+    });
+    expect(result.current).toBe('getnetworkid-test');
+  });
+});
+
 function mockRule(): GenericRule<{}> {
   return {
     severity: '',
@@ -104,10 +126,15 @@ function mockRule(): GenericRule<{}> {
   };
 }
 
-async function renderHookAsync(renderFn): any {
-  let response;
+async function renderHookAsync<TProps, TResult>(
+  renderFn: TProps => TResult,
+): Promise<RenderResult<TResult>> {
+  let response: ?RenderResult<TResult>;
   await hooksAct(async () => {
-    response = await renderHook(renderFn);
+    response = await renderHook<TProps, TResult>(renderFn);
   });
+  if (response == null) {
+    throw new Error('render failed');
+  }
   return response;
 }

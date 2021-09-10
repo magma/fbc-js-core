@@ -7,30 +7,27 @@
  * @flow strict-local
  * @format
  */
+
 import 'jest-dom/extend-expect';
 import * as React from 'react';
 import AlertRules from '../AlertRules';
-import {act, cleanup, fireEvent, render} from '@testing-library/react';
+import {act, fireEvent, render} from '@testing-library/react';
 import {alarmTestUtil} from '../../test/testHelpers';
 import {assertType} from '../../util/assert';
 import {mockPrometheusRule} from '../../test/testData';
 
-jest.mock('../../hooks/useSnackbar');
-jest.mock('../../hooks/useRouter');
-
-afterEach(() => {
-  cleanup();
-  jest.clearAllMocks();
-});
+jest.mock('@fbcnms/ui/hooks/useSnackbar');
+jest.mock('@fbcnms/ui/hooks/useRouter');
 
 const {apiUtil, AlarmsWrapper} = alarmTestUtil();
 
-const enqueueSnackbarMock = jest.fn();
+jest.spyOn(apiUtil, 'getMetricSeries').mockResolvedValue([]);
+const snackbarsMock = {error: jest.fn(), success: jest.fn()};
 jest
-  .spyOn(require('../../hooks/useSnackbar'), 'useEnqueueSnackbar')
-  .mockReturnValue(enqueueSnackbarMock);
+  .spyOn(require('@fbcnms/ui/hooks/useSnackbar'), 'useSnackbars')
+  .mockReturnValue(snackbarsMock);
 jest
-  .spyOn(require('../../hooks/useRouter'), 'default')
+  .spyOn(require('@fbcnms/ui/hooks/useRouter'), 'default')
   .mockReturnValue({match: {params: {networkId: 'test'}}});
 
 const useLoadRulesMock = jest
@@ -112,15 +109,16 @@ test('clicking the "edit" button in the table menu opens AddEditAlert for that a
     isLoading: false,
   };
   useLoadRulesMock.mockReturnValueOnce(resp);
-  const {getByText, getByLabelText} = render(
+  const {getByText, getByLabelText, getAllByTitle} = render(
     <AlarmsWrapper>
       <AlertRules />
     </AlarmsWrapper>,
   );
 
-  // open the table row menu
+  const actionMenu = getAllByTitle('Actions');
+  expect(actionMenu[0]).toBeInTheDocument();
   act(() => {
-    fireEvent.click(getByLabelText(/action menu/i));
+    fireEvent.click(actionMenu[0]);
   });
   // click the edit buton
   act(() => {
@@ -145,7 +143,7 @@ describe('AddEditAlert > Prometheus Editor', () => {
       isLoading: false,
     });
     const {getByTestId, getByLabelText} = render(
-      <AlarmsWrapper>
+      <AlarmsWrapper thresholdEditorEnabled={false}>
         <AlertRules />
       </AlarmsWrapper>,
     );
@@ -173,15 +171,15 @@ describe('AddEditAlert > Prometheus Editor', () => {
       });
     });
     act(() => {
-      fireEvent.change(getByLabelText(/metric/i), {
-        target: {value: 'vector(1)'},
+      fireEvent.change(getByLabelText(/expression/i), {
+        target: {value: 'vector(1) == 0'},
       });
     });
     // This triggers an async call so must be awaited
     await act(async () => {
       fireEvent.submit(getByTestId('editor-form'));
     });
-    expect(createAlertRuleMock.mock.calls.slice(-2)[0][0]).toMatchObject({
+    expect(createAlertRuleMock.mock.calls[0][0]).toMatchObject({
       networkId: 'test',
       rule: {
         alert: '<<ALERTNAME>>',
@@ -195,11 +193,6 @@ describe('AddEditAlert > Prometheus Editor', () => {
   });
 
   test('a snackbar is enqueued if adding a rule fails', async () => {
-    const enqueueMock = jest.fn();
-    jest
-      .spyOn(require('../../hooks/useSnackbar'), 'useEnqueueSnackbar')
-      .mockReturnValue(enqueueMock);
-
     axiosMock.mockRejectedValueOnce({
       response: {
         status: 500,
@@ -219,6 +212,6 @@ describe('AddEditAlert > Prometheus Editor', () => {
       fireEvent.submit(getByTestId('editor-form'));
     });
 
-    expect(enqueueMock).toHaveBeenCalled();
+    expect(snackbarsMock.success).toHaveBeenCalled();
   });
 });

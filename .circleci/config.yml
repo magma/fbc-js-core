@@ -105,11 +105,6 @@ workflows:
   deploy:
     jobs:
       - deploy:
-          name: deploy-fbcnms-strings
-          package_dir: fbcnms-strings
-          package_name: fbcnms/strings
-          <<: *onlymaster
-      - deploy:
           name: deploy-fbcnms-util
           package_dir: fbcnms-util
           package_name: fbcnms/util
@@ -118,11 +113,6 @@ workflows:
           name: deploy-fbcnms-ui
           package_dir: fbcnms-ui
           package_name: fbcnms/ui
-          <<: *onlymaster
-      - deploy:
-          name: deploy-fbcnms-relay
-          package_dir: fbcnms-relay
-          package_name: fbcnms/relay
           <<: *onlymaster
       - deploy:
           name: deploy-fbcnms-babel-register
@@ -173,11 +163,6 @@ workflows:
           name: deploy-fbcnms-projects
           package_dir: fbcnms-projects
           package_name: fbcnms/projects
-          <<: *onlymaster
-      - deploy:
-          name: deploy-fbcnms-magma-api
-          package_dir: fbcnms-magma-api
-          package_name: fbcnms/magma-api
           <<: *onlymaster
       - deploy:
           name: deploy-fbcnms-mobileapp

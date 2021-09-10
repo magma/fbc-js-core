@@ -7,17 +7,17 @@
  * @flow strict-local
  * @format
  */
-
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import React from 'react';
-import SimpleTable, {toLabels} from '../table/SimpleTable';
+import SimpleTable, {MultiGroupsCell, toLabels} from '../table/SimpleTable';
 import TableActionDialog from '../table/TableActionDialog';
-import useRouter from '../../hooks/useRouter';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
-import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
+import {useNetworkId} from '../../components/hooks';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
+
 import {useState} from 'react';
 
 const useStyles = makeStyles(theme => ({
@@ -45,21 +45,19 @@ export default function Suppressions() {
   );
   const [_isAddEditAlert, _setIsAddEditAlert] = useState<boolean>(false);
   const classes = useStyles();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
-
+  const snackbars = useSnackbars();
+  const networkId = useNetworkId();
   const {isLoading, error, response} = apiUtil.useAlarmsApi(
     apiUtil.getSuppressions,
-    {networkId: match.params.networkId},
+    {networkId},
     lastRefreshTime,
   );
 
   if (error) {
-    enqueueSnackbar(
+    snackbars.error(
       `Unable to load suppressions: ${
         error.response ? error.response.data.message : error.message
       }`,
-      {variant: 'error'},
     );
   }
 
@@ -68,22 +66,28 @@ export default function Suppressions() {
   return (
     <>
       <SimpleTable
-        tableData={silencesList}
-        onActionsClick={(alert, target) => {
-          setMenuAnchorEl(target);
-          setCurrentRow(alert);
-        }}
+        onRowClick={row => setCurrentRow(row)}
         columnStruct={[
-          {title: 'name', getValue: row => row.comment || ''},
-          {title: 'active', getValue: row => row.status?.state ?? ''},
-          {title: 'created by', getValue: row => row.createdBy},
+          {title: 'Name', field: 'comment'},
+          {title: 'Active', field: 'status.state'},
+          {title: 'Created By', field: 'createdBy'},
           {
-            title: 'matchers',
-            getValue: row =>
-              row.matchers
+            title: 'Matchers',
+            field: 'matchers',
+            render: row => {
+              const value = row.matchers
                 ? row.matchers.map(matcher => toLabels(matcher))
-                : [],
-            render: 'multipleGroups',
+                : [];
+              return <MultiGroupsCell value={value} />;
+            },
+          },
+        ]}
+        tableData={silencesList || []}
+        dataTestId="suppressions"
+        menuItems={[
+          {
+            name: 'View',
+            handleFunc: () => setShowDialog(true),
           },
         ]}
       />

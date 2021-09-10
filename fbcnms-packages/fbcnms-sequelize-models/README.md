@@ -1,6 +1,34 @@
 # fbcnms-sequelize-models
 
-## dbDataMigration Usage
+Package `@fbcnms/sequelize-models` uses the [Sequelize ORM](https://sequelize.org/)
+and defines various models commonly used in different NMS products.
+
+As of last update, this package is used by various Facebook Connectivity products,
+and also [Magma](https://www.magmacore.org/).
+
+## Models
+
+**Organization**
+
+Access control to NMS products are separated based on organizations.
+
+For example, in Magma, organizations can be assigned access to one or more
+networks.
+
+**User**
+
+Users exist per-organization, and additional access control can be set for
+individual users.
+
+**Audit Log Entry**
+
+A log of all actions taken by users on the NMS.
+
+**Feature Flag**
+
+## Yarn Commands
+
+### dbDataMigration Usage
 
 Used for migration of sequelize-models data from one DB to another
 

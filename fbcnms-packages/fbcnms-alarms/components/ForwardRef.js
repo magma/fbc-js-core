@@ -36,7 +36,7 @@ import * as React from 'react';
 import type {AbstractComponent, ComponentType, ElementConfig, Ref} from 'react';
 
 export type ForwardRef = {|
-  fwdRef?: Ref<any>,
+  fwdRef?: Ref<*>,
 |};
 
 export function withForwardRef<

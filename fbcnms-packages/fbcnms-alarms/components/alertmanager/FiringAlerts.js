@@ -7,25 +7,24 @@
  * @flow strict-local
  * @format
  */
-
 import AddAlertTwoToneIcon from '@material-ui/icons/AddAlertTwoTone';
 import AlertDetailsPane from './AlertDetails/AlertDetailsPane';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import React from 'react';
-import SimpleTable, {toLabels} from '../table/SimpleTable';
+import SeverityIndicator from '../severity/SeverityIndicator';
+import SimpleTable from '../table/SimpleTable';
 import Slide from '@material-ui/core/Slide';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
-import useRouter from '../../hooks/useRouter';
+import useRouter from '@fbcnms/ui/hooks/useRouter';
 import {Link} from 'react-router-dom';
-import {SEVERITY} from '../severity/Severity';
-import {get} from 'lodash';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../AlarmContext';
 import {useEffect, useState} from 'react';
-import {useEnqueueSnackbar} from '../../hooks/useSnackbar';
+import {useNetworkId} from '../../components/hooks';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
 
 import type {FiringAlarm} from '../AlarmAPIType';
 
@@ -49,7 +48,12 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function FiringAlerts() {
+type Props = {
+  emptyAlerts?: React$Node,
+};
+
+export default function FiringAlerts(props: Props) {
+  const {match} = useRouter();
   const {apiUtil, filterLabels} = useAlarmContext();
   const [selectedRow, setSelectedRow] = useState<?FiringAlarm>(null);
   const [lastRefreshTime, _setLastRefreshTime] = useState<string>(
@@ -57,11 +61,11 @@ export default function FiringAlerts() {
   );
   const [alertData, setAlertData] = useState<?Array<FiringAlarm>>(null);
   const classes = useStyles();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
+  const snackbars = useSnackbars();
+  const networkId = useNetworkId();
   const {error, isLoading, response} = apiUtil.useAlarmsApi(
     apiUtil.viewFiringAlerts,
-    {networkId: match.params.networkId},
+    {networkId},
     lastRefreshTime,
   );
 
@@ -96,14 +100,15 @@ export default function FiringAlerts() {
     setSelectedRow(null);
   }, [setSelectedRow]);
 
-  if (error) {
-    enqueueSnackbar(
-      `Unable to load firing alerts. ${
-        error.response ? error.response.data.message : error.message || ''
-      }`,
-      {variant: 'error'},
-    );
-  }
+  React.useEffect(() => {
+    if (error) {
+      snackbars.error(
+        `Unable to load firing alerts. ${
+          error.response ? error.response.data.message : error.message || ''
+        }`,
+      );
+    }
+  }, [error, snackbars]);
 
   if (!isLoading && alertData?.length === 0) {
     return (
@@ -115,25 +120,33 @@ export default function FiringAlerts() {
         justify="center"
         data-testid="no-alerts-icon"
         style={{minHeight: '60vh'}}>
-        <Grid item>
-          <AddAlertTwoToneIcon
-            color="primary"
-            className={classes.addAlertIcon}
-          />
-        </Grid>
-        <Grid item>
-          <span className={classes.helperText}>Start creating alert rules</span>
-        </Grid>
-        <Grid item>
-          <Button
-            color="primary"
-            size="small"
-            variant="contained"
-            component={Link}
-            to={`/alarms/${match.params.networkName || ''}/rules`}>
-            Add Alert Rule
-          </Button>
-        </Grid>
+        {!(props.emptyAlerts ?? false) ? (
+          <>
+            <Grid item>
+              <AddAlertTwoToneIcon
+                color="primary"
+                className={classes.addAlertIcon}
+              />
+            </Grid>
+            <Grid item>
+              <span className={classes.helperText}>
+                Start creating alert rules
+              </span>
+            </Grid>
+            <Grid item>
+              <Button
+                color="primary"
+                size="small"
+                variant="contained"
+                component={Link}
+                to={`${match.url.slice(0, match.url.lastIndexOf('/'))}/rules`}>
+                Add Alert Rule
+              </Button>
+            </Grid>
+          </>
+        ) : (
+          <>{props.emptyAlerts}</>
+        )}
       </Grid>
     );
   }
@@ -144,68 +157,37 @@ export default function FiringAlerts() {
           onRowClick={showRowDetailsPane}
           columnStruct={[
             {
-              title: 'name',
-              getValue: x => x.labels?.alertname,
-              renderFunc: (data, classes) => {
-                const entity =
-                  data.labels.entity || data.labels.nodeMac || null;
-                const desc = data?.annotations?.description ?? '';
-                return (
-                  <>
-                    <Typography variant="body1">
-                      {data.labels?.alertname}
-                    </Typography>
-                    {entity && (
-                      <Typography variant="body2">{entity}</Typography>
-                    )}
-                    <div className={classes.secondaryItalicCell}>{desc}</div>
-                  </>
-                );
-              },
+              title: 'Name',
+              field: 'labels.alertname',
+              render: currRow => (
+                <Typography noWrap>
+                  <span>{currRow.labels?.alertname}</span>
+                </Typography>
+              ),
             },
             {
-              title: 'severity',
-              getValue: x => x.labels?.severity,
-              render: 'severity',
+              title: 'Severity',
+              field: 'labels.severity',
+              render: currRow => (
+                <SeverityIndicator severity={currRow.labels?.severity} />
+              ),
             },
             {
-              title: 'date',
-              getValue: x => x.startsAt,
-              renderFunc: (data, classes) => {
-                const date = moment(new Date(data.startsAt));
+              title: 'Date',
+              field: 'startsAt',
+              render: currRow => {
+                const date = moment(new Date(currRow.startsAt));
                 return (
                   <>
                     <Typography variant="body1">{date.fromNow()}</Typography>
-
-                    <div className={classes.secondaryItalicCell}>
-                      {date.format('dddd, MMMM Do YYYY')}
-                    </div>
+                    <div>{date.format('dddd, MMMM Do YYYY')}</div>
                   </>
                 );
               },
             },
-            {
-              title: 'labels',
-              getValue: x => toLabels(x.labels),
-              render: 'labels',
-              hideFields: ['alertname', 'severity', 'team'],
-            },
-            {
-              title: 'annotations',
-              getValue: x => toLabels(x.annotations),
-              render: 'labels',
-              hideFields: ['description'],
-            },
           ]}
           tableData={alertData || []}
-          sortFunc={alert =>
-            get(
-              SEVERITY,
-              [get(alert, ['labels', 'severity']).toLowerCase(), 'index'],
-              undefined,
-            )
-          }
-          data-testid="firing-alerts"
+          dataTestId="firing-alerts"
         />
         {isLoading && (
           <div className={classes.loading}>

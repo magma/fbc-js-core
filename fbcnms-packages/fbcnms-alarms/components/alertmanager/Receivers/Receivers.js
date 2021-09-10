@@ -17,13 +17,14 @@ import Grid from '@material-ui/core/Grid';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import SettingsIcon from '@material-ui/icons/Settings';
-import SimpleTable from '../../table/SimpleTable';
+import SimpleTable, {LabelsCell} from '../../table/SimpleTable';
 import TableActionDialog from '../../table/TableActionDialog';
 import TableAddButton from '../../table/TableAddButton';
-import useRouter from '../../../hooks/useRouter';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from '../../AlarmContext';
-import {useEnqueueSnackbar} from '../../../hooks/useSnackbar';
+import {useNetworkId} from '../../../components/hooks';
+import {useSnackbars} from '@fbcnms/ui/hooks/useSnackbar';
+
 import type {AlertReceiver} from '../../AlarmAPIType';
 
 const useStyles = makeStyles(theme => ({
@@ -50,17 +51,9 @@ export default function Receivers() {
   const [lastRefreshTime, setLastRefreshTime] = React.useState<string>(
     new Date().toLocaleString(),
   );
+  const networkId = useNetworkId();
   const classes = useStyles();
-  const {match} = useRouter();
-  const enqueueSnackbar = useEnqueueSnackbar();
-  const handleActionsMenuOpen = React.useCallback(
-    (row: AlertReceiver, eventTarget: HTMLElement) => {
-      setSelectedRow(row);
-      menuAnchorEl.current = eventTarget;
-      setIsMenuOpen(true);
-    },
-    [menuAnchorEl, setIsMenuOpen, setSelectedRow],
-  );
+  const snackbars = useSnackbars();
 
   const handleActionsMenuClose = React.useCallback(() => {
     setSelectedRow(null);
@@ -79,29 +72,24 @@ export default function Receivers() {
       try {
         if (selectedRow) {
           await apiUtil.deleteReceiver({
-            networkId: match.params.networkId,
+            networkId,
             receiverName: selectedRow.name,
           });
-          enqueueSnackbar(`Successfully deleted receiver`, {
-            variant: 'success',
-          });
+          snackbars.success(`Successfully deleted receiver`);
           setIsMenuOpen(false);
         }
       } catch (error) {
-        enqueueSnackbar(
+        snackbars.error(
           `Unable to delete receiver: ${
             error.response ? error.response?.data?.message : error.message
           }. Please try again.`,
-          {
-            variant: 'error',
-          },
         );
       } finally {
         setLastRefreshTime(new Date().toLocaleString());
       }
     }
     makeRequest();
-  }, [apiUtil, enqueueSnackbar, match.params.networkId, selectedRow]);
+  }, [apiUtil, networkId, selectedRow, snackbars]);
 
   const handleViewDialogOpen = React.useCallback(() => {
     setIsDialogOpen(true);
@@ -114,16 +102,15 @@ export default function Receivers() {
 
   const {isLoading, error, response} = apiUtil.useAlarmsApi(
     apiUtil.getReceivers,
-    {networkId: match.params.networkId},
+    {networkId},
     lastRefreshTime,
   );
 
   if (error) {
-    enqueueSnackbar(
+    snackbars.error(
       `Unable to load receivers: ${
         error.response ? error.response.data.message : error.message
       }`,
-      {variant: 'error'},
     );
   }
 
@@ -166,21 +153,41 @@ export default function Receivers() {
         </Grid>
       )}
       <Grid item>
-        <SimpleTable
-          tableData={receiversData}
-          onActionsClick={handleActionsMenuOpen}
-          columnStruct={[
-            {
-              title: 'name',
-              getValue: row => row.name,
-            },
-            {
-              title: 'notifications',
-              render: 'labels',
-              getValue: getNotificationsSummary,
-            },
-          ]}
-        />
+        <>
+          <SimpleTable
+            onRowClick={row => setSelectedRow(row)}
+            columnStruct={[
+              {
+                title: 'Name',
+                field: 'name',
+              },
+              {
+                title: 'Notifications',
+                field: 'labels',
+                render: row => {
+                  const labels = getNotificationsSummary(row);
+                  return <LabelsCell value={labels} />;
+                },
+              },
+            ]}
+            tableData={receiversData}
+            dataTestId="receiver"
+            menuItems={[
+              {
+                name: 'View',
+                handleFunc: () => handleViewDialogOpen(),
+              },
+              {
+                name: 'Edit',
+                handleFunc: () => handleEdit(),
+              },
+              {
+                name: 'Delete',
+                handleFunc: () => handleDelete(),
+              },
+            ]}
+          />
+        </>
       </Grid>
       {isLoading && receiversData.length === 0 && (
         <div className={classes.loading}>
@@ -210,7 +217,6 @@ export default function Receivers() {
           setIsNewReceiver(true);
           setIsAddEditReceiver(true);
           setSelectedRow(null);
-          setIsMenuOpen(false);
         }}
         data-testid="add-receiver-button"
       />

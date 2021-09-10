@@ -13,7 +13,7 @@ import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import {makeStyles} from '@material-ui/core/styles';
+import {makeStyles} from '@material-ui/styles';
 import type {RuleInterfaceMap} from './RuleInterface';
 
 const useRuleTypeStyles = makeStyles(theme => ({
@@ -46,6 +46,13 @@ export default function SelectRuleType<TRuleUnion>({
     [ruleMap],
   );
 
+  const handleChange = React.useCallback(
+    (_e: SyntheticInputEvent<HTMLInputElement>, val: string) => {
+      onChange(val);
+    },
+    [onChange],
+  );
+
   // if there's < 2 rule types, just stick with the default rule type
   if (ruleTypes.length < 2) {
     return null;
@@ -64,7 +71,8 @@ export default function SelectRuleType<TRuleUnion>({
         color="primary"
         variant="outlined"
         value={value}
-        onChange={onChange}>
+        onChange={handleChange}
+        exclusive>
         {ruleTypes.map(ruleType => (
           <ToggleButton
             className={classes.button}

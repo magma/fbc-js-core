@@ -10,9 +10,9 @@
 
 import * as React from 'react';
 import axios from 'axios';
-import useRouter from '../hooks/useRouter';
-import {useEnqueueSnackbar} from '../hooks/useSnackbar';
-
+import useRouter from '@fbcnms/ui/hooks/useRouter';
+import {useAlarmContext} from '@fbcnms/alarms/components/AlarmContext';
+import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import type {AlertRoutingTree} from './AlarmAPIType';
 import type {ApiUtil} from './AlarmsApi';
 import type {GenericRule, RuleInterfaceMap} from './rules/RuleInterface';
@@ -29,7 +29,7 @@ export function useLoadRules<TRuleUnion>({
   ruleMap: RuleInterfaceMap<TRuleUnion>,
   lastRefreshTime: string,
 }): {rules: Array<GenericRule<TRuleUnion>>, isLoading: boolean} {
-  const {match} = useRouter();
+  const networkId = useNetworkId();
   const enqueueSnackbar = useEnqueueSnackbar();
   const [isLoading, setIsLoading] = React.useState(true);
   const [rules, setRules] = React.useState<Array<GenericRule<TRuleUnion>>>([]);
@@ -38,8 +38,7 @@ export function useLoadRules<TRuleUnion>({
     const promises = Object.keys(ruleMap || {}).map((ruleType: string) => {
       const cancelSource = axios.CancelToken.source();
       const request = {
-        // for magma api
-        networkId: match.params.networkId,
+        networkId,
         cancelToken: cancelSource.token,
       };
 
@@ -67,7 +66,7 @@ export function useLoadRules<TRuleUnion>({
       setRules(allResults);
       setIsLoading(false);
     });
-  }, [enqueueSnackbar, lastRefreshTime, match.params.networkId, ruleMap]);
+  }, [enqueueSnackbar, lastRefreshTime, networkId, ruleMap]);
 
   return {
     rules,
@@ -87,9 +86,9 @@ export function useAlertRuleReceiver({
   ruleName: string,
   apiUtil: ApiUtil,
 }) {
-  const {match} = useRouter();
+  const networkId = useNetworkId();
   const {response} = apiUtil.useAlarmsApi(apiUtil.getRouteTree, {
-    networkId: match.params.networkId,
+    networkId,
   });
 
   // find all the routes which contain an alertname matcher for this alert
@@ -126,7 +125,7 @@ export function useAlertRuleReceiver({
   const saveReceiver = React.useCallback(async () => {
     let updatedRoutes: AlertRoutingTree = response || {
       routes: [],
-      receiver: `${match.params.networkId || 'tg'}_tenant_base_route`,
+      receiver: `${networkId || 'tg'}_tenant_base_route`,
     };
     if (
       (receiver == null || receiver.trim() === '') &&
@@ -167,17 +166,19 @@ export function useAlertRuleReceiver({
       };
     }
     await apiUtil.editRouteTree({
-      networkId: match.params.networkId,
+      networkId: networkId,
       route: updatedRoutes,
     });
-  }, [
-    receiver,
-    initialReceiver,
-    apiUtil,
-    match.params.networkId,
-    response,
-    ruleName,
-  ]);
+  }, [receiver, initialReceiver, apiUtil, networkId, response, ruleName]);
 
   return {receiver, setReceiver, saveReceiver};
+}
+
+export function useNetworkId(): string {
+  const {match} = useRouter();
+  const {getNetworkId} = useAlarmContext();
+  if (typeof getNetworkId === 'function') {
+    return getNetworkId();
+  }
+  return match.params.networkId;
 }

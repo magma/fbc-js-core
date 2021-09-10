@@ -10,12 +10,12 @@
  */
 
 import * as React from 'react';
-import DescriptionIcon from '@material-ui/icons/Description';
+import Collapse from '@material-ui/core/Collapse';
 import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
-import {Detail, ObjectViewer, Section} from './AlertDetailsPane';
+import {ObjectViewer} from './AlertDetailsPane';
 import {useAlarmContext} from '../../AlarmContext';
-
 import type {AlertViewerProps} from '../../rules/RuleInterface';
 
 export default function MetricAlertViewer({alert}: AlertViewerProps) {
@@ -23,21 +23,30 @@ export default function MetricAlertViewer({alert}: AlertViewerProps) {
   const {labels, annotations} = alert || {};
   const {alertname: _a, severity: _s, ...extraLabels} = labels || {};
   const {description, ...extraAnnotations} = annotations || {};
+  const [showDetails, setShowDetails] = React.useState(false);
   return (
-    <Grid container data-testid="metric-alert-viewer" spacing={2}>
-      <Section title={'Details'}>
-        <Detail icon={DescriptionIcon} title="Description">
-          <Typography color="textSecondary">{description}</Typography>
-        </Detail>
-      </Section>
-      <Section title={'Labels'}>
+    <Grid container data-testid="metric-alert-viewer" spacing={5}>
+      <Grid item>
+        <Typography variant="body1">{description}</Typography>
+      </Grid>
+      <Grid item>
         <ObjectViewer
           object={filterLabels ? filterLabels(extraLabels) : extraLabels}
         />
-      </Section>
-      <Section title={'Annotations'} divider={false}>
-        <ObjectViewer object={extraAnnotations} />
-      </Section>
+      </Grid>
+      <Grid item xs={12}>
+        <Link
+          variant="subtitle1"
+          component="button"
+          onClick={() => setShowDetails(!showDetails)}>
+          {'Show More Details'}
+        </Link>
+      </Grid>
+      <Grid item>
+        <Collapse in={showDetails}>
+          <ObjectViewer object={extraAnnotations} />
+        </Collapse>
+      </Grid>
     </Grid>
   );
 }
