@@ -91,30 +91,6 @@ jobs:
           name: npm publish
           working_directory: fbcnms-packages/<<parameters.package_dir>>
           command: npm publish --access public
-  citest:
-    docker:
-      - image: circleci/node
-    parameters:
-      package_dir:
-        type: string
-      package_name:
-        type: string
-    steps:
-      - checkout
-      - run:
-          name: Halt on no changes
-          working_directory: fbcnms-packages/<<parameters.package_dir>>
-          command: |
-            published=$(npm -s show <<parameters.package_name>> version || exit 0)
-            current=$(node -p "require('./package.json').version")
-            if [[ $published == $current ]]; then
-              circleci step halt
-            fi
-      - run:
-          name: npm auth
-          working_directory: fbcnms-packages/<<parameters.package_dir>>
-          command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-      - yarn-install
 
 workflows:
   version: 2.1
@@ -126,15 +102,6 @@ workflows:
       - yarntest:
           requires:
             - flowtest
-  citest:
-    jobs:
-      - citest:
-          name: deploy-fbcnms-ui
-          package_dir: fbcnms-ui
-          package_name: fbcnms/ui
-          <<: *onlypr
-          
-
   deploy:
     jobs:
       - deploy:
