@@ -4,11 +4,11 @@ aliases:
   - &onlypr
     filters:
       branches:
-        ignore: master
-  - &onlymaster
+        ignore: main
+  - &onlymain
     filters:
       branches:
-        only: master
+        only: main
 
 executors:
   yarnnode:
@@ -108,69 +108,69 @@ workflows:
           name: deploy-fbcnms-util
           package_dir: fbcnms-util
           package_name: fbcnms/util
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-ui
           package_dir: fbcnms-ui
           package_name: fbcnms/ui
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-babel-register
           package_dir: fbcnms-babel-register
           package_name: fbcnms/babel-register
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-alarms
           package_dir: fbcnms-alarms
           package_name: fbcnms/alarms
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-webpack-config
           package_dir: fbcnms-webpack-config
           package_name: fbcnms/webpack-config
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-platform-server
           package_dir: fbcnms-platform-server
           package_name: fbcnms/platform-server
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-auth
           package_dir: fbcnms-auth
           package_name: fbcnms/auth
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-express-middleware
           package_dir: fbcnms-express-middleware
           package_name: fbcnms/express-middleware
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-sequelize-models
           package_dir: fbcnms-sequelize-models
           package_name: fbcnms/sequelize-models
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-logging
           package_dir: fbcnms-logging
           package_name: fbcnms/logging
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-types
           package_dir: fbcnms-types
           package_name: fbcnms/types
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-projects
           package_dir: fbcnms-projects
           package_name: fbcnms/projects
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-fbcnms-mobileapp
           package_dir: fbcnms-mobileapp
           package_name: fbcnms/mobileapp
-          <<: *onlymaster
+          <<: *onlymain
       - deploy:
           name: deploy-eslint-config-fbcnms
           package_dir: eslint-config-fbcnms
           package_name: eslint-config-fbcnms
-          <<: *onlymaster
+          <<: *onlymain
