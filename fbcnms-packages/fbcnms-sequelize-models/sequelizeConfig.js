@@ -9,7 +9,7 @@
  */
 
 import type {Options} from 'sequelize';
-
+const fs = require('fs');
 // TODO: Pull from shared config
 const MYSQL_HOST = process.env.MYSQL_HOST || '127.0.0.1';
 const MYSQL_PORT = parseInt(process.env.MYSQL_PORT || '3306');
@@ -19,6 +19,49 @@ const MYSQL_DB = process.env.MYSQL_DB || 'cxl';
 const MYSQL_DIALECT = process.env.MYSQL_DIALECT || 'mysql';
 
 const logger = require('@fbcnms/logging').getLogger(module);
+
+let ssl_required = false;
+let CAcert = process.env.CA_FILE;
+let Ckey = process.env.KEY_FILE;
+let Ccert = process.env.CERT_FILE;
+let dialectOptions = {};
+
+if (process.env.CA_FILE) {
+  try {
+    CAcert = fs.readFileSync(process.env.CA_FILE);
+    ssl_required = true;
+  } catch (e) {
+    console.warn('cannot read ca cert file', e);
+  }
+}
+
+if (process.env.KEY_FILE) {
+  try {
+    Ckey = fs.readFileSync(process.env.KEY_FILE);
+    ssl_required = true;
+  } catch (e) {
+    console.warn('cannot read key file', e);
+  }
+}
+
+if (process.env.CERT_FILE) {
+  try {
+    Ccert = fs.readFileSync(process.env.CERT_FILE);
+    ssl_required = true;
+  } catch (e) {
+    console.warn('cannot read cert file', e);
+  }
+}
+
+if (ssl_required) {
+  dialectOptions = {
+    ssl: {
+      ca: CAcert,
+      key: Ckey,
+      cert: Ccert,
+    },
+  };
+}
 
 const config: {[string]: Options} = {
   test: {
@@ -35,6 +78,8 @@ const config: {[string]: Options} = {
     host: MYSQL_HOST,
     port: MYSQL_PORT,
     dialect: MYSQL_DIALECT,
+    ssl: ssl_required,
+    dialectOptions,
     logging: (msg: string) => logger.debug(msg),
   },
   production: {
@@ -44,6 +89,8 @@ const config: {[string]: Options} = {
     host: MYSQL_HOST,
     port: MYSQL_PORT,
     dialect: MYSQL_DIALECT,
+    ssl: ssl_required,
+    dialectOptions,
     logging: (msg: string) => logger.debug(msg),
   },
 };
