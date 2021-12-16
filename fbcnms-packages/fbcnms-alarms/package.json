@@ -20,7 +20,7 @@
     "@fbcnms/ui": "1.0.0",
     "classnames": "^2.2.5",
     "copy-to-clipboard": "^3.0.8",
-    "material-table": "^1.69.3",
+    "@material-table/core": "^4.3.6",
     "moment": "^2.24.0",
     "moo": "^0.5.1",
     "nearley": "^2.19.0",

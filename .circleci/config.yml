@@ -13,7 +13,7 @@ aliases:
 executors:
   yarnnode:
     docker:
-      - image: circleci/node:10-buster-browsers-legacy
+      - image: cimg/node:16.13.1
 
 commands:
   yarn-install:
