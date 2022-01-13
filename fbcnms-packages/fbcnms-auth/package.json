@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/auth",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "dependencies": {
     "@fbcnms/sequelize-models": "^0.1.11",
     "@fbcnms/webpack-config": "^0.1.0",
