@@ -48,6 +48,18 @@ router.get(
   }),
 );
 
+router.get(
+  '/organization/async/:name/users',
+  asyncHandler(async (req: FBCNMSRequest, res) => {
+    const users = await User.findAll({
+      where: {
+        organization: req.params.name,
+      },
+    });
+    res.status(200).send(users);
+  }),
+);
+
 const configFromFeatureFlag = flag => ({
   id: flag.id,
   enabled: flag.enabled,
