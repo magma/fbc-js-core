@@ -8,8 +8,8 @@
  * @format
  */
 
-import MultiSamlStrategy from 'passport-saml/multiSamlStrategy';
 import {AccessRoles} from '../roles';
+import {MultiSamlStrategy} from 'passport-saml';
 import {User} from '@fbcnms/sequelize-models';
 
 import {getUserFromRequest} from '../util';
