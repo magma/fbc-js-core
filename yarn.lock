@@ -1298,17 +1298,10 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.3.1", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.0", "@babel/runtime@^7.5.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.0", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.10.3", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.3.1", "@babel/runtime@^7.3.4", "@babel/runtime@^7.4.4", "@babel/runtime@^7.5.0", "@babel/runtime@^7.5.4", "@babel/runtime@^7.5.5", "@babel/runtime@^7.6.0", "@babel/runtime@^7.6.3", "@babel/runtime@^7.7.2", "@babel/runtime@^7.7.6", "@babel/runtime@^7.8.3", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.10.4.tgz#a6724f1a6b8d2f6ea5236dbfe58c7d7ea9c5eb99"
   integrity sha512-UpTN5yUJr9b4EX2CnGNWIvER7Ab83ibv0pcvvHc4UOdrBI5jb8bj+32cCwPX6xu0mt2daFNjYhoi+X7beH0RSw==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
-"@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5":
-  version "7.16.7"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.16.7.tgz#03ff99f64106588c9c403c6ecb8c3bafbbdff1fa"
-  integrity sha512-9E9FJowqAsytyOY6LG+1KuueckRL+aQW+mKvXRXnuFGyRAyepJPmEo9vgMfXUA6O9u3IeEdv9MAkppFcaQwogQ==
   dependencies:
     regenerator-runtime "^0.13.4"
 
@@ -7850,10 +7843,10 @@ flatted@^2.0.0:
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.2.tgz#4575b21e2bcee7434aa9be662f4b7b5f9c2b5138"
   integrity sha512-r5wGx7YeOwNWNlCA0wQ86zKyDLMQr+/RB8xy74M4hTphfmjlijTSSXGuH8rnvKZnfT9i+75zmd8jcKdMR4O6jA==
 
-flow-bin@0.128.0:
-  version "0.128.0"
-  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.128.0.tgz#fd1232a64dc46874d8d499f16a1934b964f4c2ae"
-  integrity sha512-EnmMSOCrkx8F0r1+T1d1HODQ+ddy5yRfkT3CvwmK05IWZyXQy27OVdNwdXUWRqc0iMW75T4QkoXaVBYrMqfk+A==
+flow-bin@0.131.0:
+  version "0.131.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.131.0.tgz#d4228b6070afdf3b2a76acdee77a7f3f8e8f5133"
+  integrity sha512-fZmoIBcDrtLhy/NNMxwJysSYzMr1ksRcAOMi3AHSoYXfcuQqTvhGJx+wqjlIOqIwz8RRYm8J4V4JrSJbIKP+Xg==
 
 flow-parser@0.*:
   version "0.128.0"
