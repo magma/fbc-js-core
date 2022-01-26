@@ -20,7 +20,10 @@ export const blue70 = '#3984ff';
 export const blue80 = '#1d3c78';
 export const blueGrayDark = '#303846';
 export const brown = '#5d4037';
+export const brightGray = '#323845';
 export const cherry = '#ad1457';
+export const comet = '#545F77';
+export const concrete = '#F2F2F2';
 export const cyan = '#00acc1';
 export const darkGreen = '#2e7d32';
 export const darkPink = '#9c27b0';
@@ -46,6 +49,7 @@ export const gray14 = '#9da9be';
 export const gray50 = '#b3b3b3';
 export const green30 = '#00af5b';
 export const green = '#66bb6a';
+export const gullGray = '#9DA7BB';
 export const lightBlue = '#42a5f5';
 export const orange = '#f9a825';
 export const pink = '#f48fb1';
@@ -67,11 +71,15 @@ export default {
   blue80,
   blueGrayDark,
   brown,
+  brightGray,
   cherry,
+  comet,
+  concrete,
   cyan,
   darkGreen,
   darkPink,
   darkPurple,
+  fadedBlue,
   fadedSea,
   gray0,
   gray00,
@@ -83,13 +91,20 @@ export default {
   gray6,
   gray7,
   gray8,
+  gray9,
+  gray10,
+  gray11,
+  gray12,
   gray13,
+  gray14,
+  gray50,
+  green30,
   green,
+  gullGray,
   lightBlue,
   orange,
   pink,
   primaryText,
-  purple,
   red,
   redwood,
   sea100,

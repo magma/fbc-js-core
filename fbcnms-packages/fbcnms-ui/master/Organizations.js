@@ -9,47 +9,159 @@
  */
 
 import type {OrganizationPlainAttributes} from '@fbcnms/sequelize-models/models/organization';
+import type {UserType} from '@fbcnms/sequelize-models/models/user.js';
 import type {WithAlert} from '@fbcnms/ui/components/Alert/withAlert';
 
-import Button from '@fbcnms/ui/components/design-system/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
+import ActionTable from '../components/ActionTable';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import EditUserDialog from '@fbcnms/ui/components/auth/EditUserDialog';
-import IconButton from '@material-ui/core/IconButton';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import LoadingFiller from '@fbcnms/ui/components/LoadingFiller';
 import NestedRouteLink from '@fbcnms/ui/components/NestedRouteLink';
 import OrganizationDialog from './OrganizationDialog';
-import Paper from '@material-ui/core/Paper';
 import PersonAdd from '@material-ui/icons/PersonAdd';
+import PersonIcon from '@material-ui/icons/Person';
 import React from 'react';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import Text from '../components/design-system/Text';
 import axios from 'axios';
-import renderList from '@fbcnms/util/renderList';
 import withAlert from '@fbcnms/ui/components/Alert/withAlert';
-import {Link, Route} from 'react-router-dom';
+
+import {Route} from 'react-router-dom';
+import {comet, concrete} from '../theme/colors';
 import {makeStyles} from '@material-ui/styles';
 import {useAxios, useRouter} from '@fbcnms/ui/hooks';
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useEnqueueSnackbar} from '@fbcnms/ui/hooks/useSnackbar';
 import {useRelativePath, useRelativeUrl} from '@fbcnms/ui/hooks/useRouter';
 
 export type Organization = OrganizationPlainAttributes;
 
+const ORGANIZATION_DESCRIPTION =
+  'Multiple organizations can be independently managed, each with access to their own networks. ' +
+  'As a host user, you can create and manage organizations here. You can also create users for these organizations.';
+
 const useStyles = makeStyles(_ => ({
+  description: {
+    margin: '20px 0',
+  },
   header: {
     margin: '10px',
     display: 'flex',
     justifyContent: 'space-between',
   },
   paper: {
-    margin: '10px',
+    margin: '40px 32px',
+  },
+  dialogTitle: {
+    fontSize: '24px',
+    color: comet,
+    backgroundColor: concrete,
+  },
+  dialog: {
+    minHeight: '200px',
+    padding: '24px',
+  },
+  dialogActions: {
+    backgroundColor: concrete,
+    boxShadow: 'none',
+  },
+  dialogButton: {
+    backgroundColor: comet,
+    color: concrete,
+    '&:hover': {
+      backgroundColor: concrete,
+      color: comet,
+    },
+  },
+
+  subtitle: {
+    margin: '16px 0',
   },
 }));
 
 type Props = {...WithAlert};
+
+function OnboardingDialog() {
+  const classes = useStyles();
+  const [open, setOpen] = useState(true);
+  return (
+    <Dialog
+      maxWidth={'sm'}
+      fullWidth={true}
+      open={open}
+      keepMounted
+      onClose={() => setOpen(false)}
+      aria-describedby="alert-dialog-slide-description">
+      <DialogTitle classes={{root: classes.dialogTitle}}>
+        {'Welcome to Magma Host Portal'}
+      </DialogTitle>
+      <DialogContent classes={{root: classes.dialog}}>
+        <DialogContentText id="alert-dialog-slide-description">
+          <Text variant="subtitle1">
+            In this portal, you can add and edit organizations and its user.
+            Follow these steps to get started:
+          </Text>
+          <List dense={true}>
+            <ListItem disableGutters>
+              <ListItemIcon>
+                <PersonIcon />
+              </ListItemIcon>
+              <Text variant="subtitle1">Add an organization</Text>
+            </ListItem>
+            <ListItem disableGutters>
+              <ListItemIcon>
+                <PersonIcon />
+              </ListItemIcon>
+              <Text variant="subtitle1">Add a user for the organization</Text>
+            </ListItem>
+            <ListItem disableGutters>
+              <ListItemIcon>
+                <PersonIcon />
+              </ListItemIcon>
+              <Text variant="subtitle1">
+                Log in to the organization portal with the user account you
+                created
+              </Text>
+            </ListItem>
+          </List>
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions classes={{root: classes.dialogActions}}>
+        <Button
+          classes={{root: classes.dialogButton}}
+          onClick={() => setOpen(false)}>
+          Get Started
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+async function getUsers(
+  organizations: Organization[],
+  setUsers: (Array<?UserType>) => void,
+) {
+  const requests = organizations.map(async organization => {
+    try {
+      const response = await axios.get(
+        `/master/organization/async/${organization.name}/users`,
+      );
+      return response.data;
+    } catch (error) {}
+  });
+  const organizationUsers = await Promise.all(requests);
+  if (organizationUsers) {
+    setUsers([...organizationUsers.flat()]);
+  }
+}
 
 function Organizations(props: Props) {
   const classes = useStyles();
@@ -58,14 +170,24 @@ function Organizations(props: Props) {
   const {history} = useRouter();
   const [organizations, setOrganizations] = useState<?(Organization[])>(null);
   const [addingUserFor, setAddingUserFor] = useState<?Organization>(null);
+  const [currRow, setCurrRow] = useState<OrganizationRowType>({});
+  const [users, setUsers] = useState<Array<?UserType>>([]);
+  const [showOnboardingDialog, setShowOnboardingDialog] = useState(false);
   const enqueueSnackbar = useEnqueueSnackbar();
   const {error, isLoading} = useAxios({
     url: '/master/organization/async',
-    onResponse: useCallback(
-      res => setOrganizations(res.data.organizations),
-      [],
-    ),
+    onResponse: useCallback(res => {
+      setOrganizations(res.data.organizations);
+      if (res.data.organizations.length < 3) {
+        setShowOnboardingDialog(true);
+      }
+    }, []),
   });
+  useEffect(() => {
+    if (organizations?.length) {
+      getUsers(organizations, setUsers);
+    }
+  }, [organizations, addingUserFor]);
 
   if (error || isLoading || !organizations) {
     return <LoadingFiller />;
@@ -77,97 +199,144 @@ function Organizations(props: Props) {
       .then(async confirm => {
         if (!confirm) return;
         await axios.delete(`/master/organization/async/${org.id}`);
-        const newOrganizations = [...organizations];
-        newOrganizations.splice(organizations.indexOf(org), 1);
-        setOrganizations(newOrganizations);
+        const newOrganizations = organizations.filter(
+          organization => organization.id !== org.id,
+        );
+        setOrganizations([...newOrganizations]);
       });
   };
 
-  const rows = organizations
-    .sort((org1, org2) => (org1.name < org2.name ? -1 : 1))
-    .map(row => (
-      <TableRow key={row.id}>
-        <TableCell>
-          <Link to={relativePath(`/detail/${row.name}`)}>{row.name}</Link>
-        </TableCell>
-        <TableCell>{renderList(row.networkIDs)}</TableCell>
-        <TableCell>
-          {row.tabs && renderList(row.tabs.map(tab => tab.toString()))}
-        </TableCell>
-        <TableCell>
-          <IconButton onClick={() => onDelete(row)}>
-            <DeleteIcon />
-          </IconButton>
-          <IconButton onClick={() => setAddingUserFor(row)}>
-            <PersonAdd />
-          </IconButton>
-        </TableCell>
-      </TableRow>
-    ));
+  type OrganizationRowType = {
+    name: string,
+    networks: Array<string>,
+    portalLink: string,
+    userNumber: number,
+    id: number,
+  };
 
+  const organizationRows: Array<OrganizationRowType> = organizations.map(
+    row => {
+      return {
+        name: row.name,
+        networks: row.networkIDs,
+        portalLink: `${row.name}`,
+        userNumber: users?.filter(user => user?.organization === row.name)
+          .length,
+        id: row.id,
+      };
+    },
+  );
   return (
     <div className={classes.paper}>
-      <div className={classes.header}>
-        <div />
-        <NestedRouteLink to="/new">
-          <Button>Add Organization</Button>
-        </NestedRouteLink>
-      </div>
-      <Paper elevation={2}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Network IDs</TableCell>
-              <TableCell>Tabs</TableCell>
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>{rows}</TableBody>
-        </Table>
-      </Paper>
-      <Route
-        path={relativePath('/new')}
-        render={() => (
-          <OrganizationDialog
-            onClose={() => history.push(relativeUrl(''))}
-            onSave={org => {
-              const newOrganizations = [...organizations];
-              newOrganizations.push(org);
-              setOrganizations(newOrganizations);
-              history.push(relativeUrl(''));
+      <Grid container>
+        <Grid container justify="space-between">
+          <Text variant="h3">Organizations</Text>
+          <NestedRouteLink to="/new">
+            <Button color="primary" variant="contained">
+              Add Organization
+            </Button>
+          </NestedRouteLink>
+        </Grid>
+        <Grid xs={12} className={classes.description}>
+          <Text variant="body2">{ORGANIZATION_DESCRIPTION}</Text>
+        </Grid>
+        <>{showOnboardingDialog && <OnboardingDialog />}</>
+        <Grid xs={12}>
+          <ActionTable
+            data={organizationRows}
+            columns={[
+              {
+                title: '',
+                field: '',
+                width: '40px',
+                editable: 'never',
+                render: rowData => (
+                  <Text variant="subtitle3">
+                    {rowData.tableData?.id + 1 || ''}
+                  </Text>
+                ),
+              },
+              {title: 'Name', field: 'name'},
+              {title: 'Accessible Networks', field: 'networks'},
+              {title: 'Link to Organization Portal', field: 'portalLink'},
+              {title: 'Number of Users', field: 'userNumber'},
+            ]}
+            handleCurrRow={(row: OrganizationRowType) => {
+              setCurrRow(row);
+            }}
+            actions={[
+              {
+                icon: () => <PersonAdd />,
+                tooltip: 'Add User',
+                onClick: (event, row) => {
+                  setAddingUserFor(row);
+                },
+              },
+            ]}
+            menuItems={[
+              {
+                name: 'View',
+                handleFunc: () => {
+                  history.push(relativeUrl(`/detail/${currRow.name}`));
+                },
+              },
+              {
+                name: 'Delete',
+                handleFunc: () => {
+                  onDelete(currRow);
+                },
+              },
+            ]}
+            options={{
+              actionsColumnIndex: -1,
+              pageSizeOptions: [5, 10],
+              toolbar: false,
+            }}
+          />
+        </Grid>
+        <Route
+          path={relativePath('/new')}
+          render={() => (
+            <OrganizationDialog
+              onClose={() => history.push(relativeUrl(''))}
+              onSave={org => {
+                const newOrganizations = [...organizations];
+                newOrganizations.push(org);
+                setOrganizations(newOrganizations);
+                history.push(relativeUrl(''));
+              }}
+            />
+          )}
+        />
+        {addingUserFor && (
+          <EditUserDialog
+            open={true}
+            ssoEnabled={!!addingUserFor.ssoEntrypoint}
+            onClose={() => setAddingUserFor(null)}
+            onEditUser={() => {}}
+            editingUser={null}
+            allNetworkIDs={addingUserFor.networkIDs}
+            onCreateUser={user => {
+              axios
+                .post(
+                  `/master/organization/async/${addingUserFor.name}/add_user`,
+                  user,
+                )
+                .then(() => {
+                  enqueueSnackbar('User added successfully', {
+                    variant: 'success',
+                  });
+                  setAddingUserFor(null);
+                })
+                .catch(error =>
+                  enqueueSnackbar(error?.response?.data?.error || error, {
+                    variant: 'error',
+                  }),
+                );
             }}
           />
         )}
-      />
-      {addingUserFor && (
-        <EditUserDialog
-          open={true}
-          ssoEnabled={!!addingUserFor.ssoEntrypoint}
-          onClose={() => setAddingUserFor(null)}
-          onEditUser={() => {}}
-          editingUser={null}
-          allNetworkIDs={addingUserFor.networkIDs}
-          onCreateUser={user => {
-            axios
-              .post(
-                `/master/organization/async/${addingUserFor.name}/add_user`,
-                user,
-              )
-              .then(() => {
-                enqueueSnackbar('User added successfully', {
-                  variant: 'success',
-                });
-                setAddingUserFor(null);
-              })
-              .catch(error =>
-                enqueueSnackbar(error?.response?.data?.error || error, {
-                  variant: 'error',
-                }),
-              );
-          }}
-        />
-      )}
+      </Grid>
     </div>
   );
 }
