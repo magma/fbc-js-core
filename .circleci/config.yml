@@ -165,11 +165,6 @@ workflows:
           package_name: fbcnms/projects
           <<: *onlymain
       - deploy:
-          name: deploy-fbcnms-mobileapp
-          package_dir: fbcnms-mobileapp
-          package_name: fbcnms/mobileapp
-          <<: *onlymain
-      - deploy:
           name: deploy-eslint-config-fbcnms
           package_dir: eslint-config-fbcnms
           package_name: eslint-config-fbcnms
