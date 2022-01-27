@@ -15,6 +15,7 @@ import * as React from 'react';
 import Text from './Text';
 import classNames from 'classnames';
 import symphony from '../../theme/symphony';
+import {comet} from '../../theme/colors';
 import {joinNullableStrings} from '@fbcnms/util/strings';
 import {makeStyles} from '@material-ui/styles';
 import {useFormElementContext} from './Form/FormElementContext';
@@ -66,8 +67,10 @@ const useStyles = makeStyles(_theme => ({
   regularSkin: {},
   graySkin: {},
   secondaryGraySkin: {},
+  cometSkin: {},
   disabled: {},
   containedVariant: {
+    color: 'white',
     height: '32px',
     minWidth: '88px',
     padding: '4px 12px',
@@ -77,6 +80,27 @@ const useStyles = makeStyles(_theme => ({
     },
     '&$hasLeftIcon': {
       padding: '4px 12px 4px 6px',
+    },
+    '&$cometSkin': {
+      backgroundColor: comet,
+      '&:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.white,
+          fill: symphony.palette.white,
+        },
+      },
+      '&:hover:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.white,
+          fill: symphony.palette.white,
+        },
+      },
+      '&:active:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.B700,
+          fill: symphony.palette.B700,
+        },
+      },
     },
     '&$primarySkin': {
       backgroundColor: symphony.palette.primary,
@@ -130,7 +154,7 @@ const useStyles = makeStyles(_theme => ({
       },
       '&:hover:not($disabled)': {
         '& $buttonText, $icon': {
-          color: symphony.palette.primary,
+          color: comet,
           fill: symphony.palette.primary,
         },
       },
@@ -298,6 +322,26 @@ const useStyles = makeStyles(_theme => ({
         },
       },
     },
+    '&$cometSkin': {
+      '&:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.D500,
+          fill: symphony.palette.D500,
+        },
+      },
+      '&:hover:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.D900,
+          fill: symphony.palette.D900,
+        },
+      },
+      '&:active:not($disabled)': {
+        '& $buttonText, $icon': {
+          color: symphony.palette.primary,
+          fill: symphony.palette.primary,
+        },
+      },
+    },
     '&$disabled': {
       cursor: 'default',
       '& $buttonText, $icon': {
@@ -316,7 +360,8 @@ export type ButtonSkin =
   | 'gray'
   | 'secondaryGray'
   | 'orange'
-  | 'green';
+  | 'green'
+  | 'comet';
 
 export type ButtonProps = $ReadOnly<{|
   skin?: ButtonSkin,

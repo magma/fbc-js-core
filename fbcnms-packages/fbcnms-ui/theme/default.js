@@ -14,12 +14,14 @@ import {
   blue30,
   blue60,
   blueGrayDark,
+  brightGray,
   fadedBlue,
   gray0,
   gray00,
   gray1,
   gray13,
   gray50,
+  gullGray,
   primaryText,
   red,
   redwood,
@@ -158,6 +160,10 @@ export default createMuiTheme({
     },
     MuiOutlinedInput: {
       root: {
+        color: brightGray,
+        backgroundColor: white,
+        minHeight: '56px',
+        borderColor: white,
         '&$notchedOutline': {
           borderColor: '#CCD0D5',
         },
@@ -170,7 +176,12 @@ export default createMuiTheme({
         },
       },
       input: {
-        fontSize: '14px',
+        color: gullGray,
+        fontFamily: '"Inter", sans-serif',
+        fontWeight: 600,
+        fontSize: '12px',
+        lineHeight: 1.33,
+        letterSpacing: '0.5px',
         lineHeight: '14px',
         paddingBottom: '12px',
         paddingTop: '12px',
@@ -203,6 +214,11 @@ export default createMuiTheme({
         '&::-ms-input-placeholder': {
           opacity: 1,
         },
+      },
+    },
+    MuiDialogContent: {
+      root: {
+        padding: '0 32px',
       },
     },
   },
