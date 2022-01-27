@@ -8,29 +8,21 @@
  * @format
  */
 
-import type {Organization} from './Organizations';
+import type {OrganizationPlainAttributes} from '@fbcnms/sequelize-models/models/organization';
 
 import Button from '@fbcnms/ui/components/design-system/Button';
-import Checkbox from '@material-ui/core/Checkbox';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import ListItemText from '@material-ui/core/ListItemText';
 import LoadingFillerBackdrop from '@fbcnms/ui/components/LoadingFillerBackdrop';
-import MenuItem from '@material-ui/core/MenuItem';
+import OrganizationInfoDialog from './OrganizationInfoDialog';
+import OrganizationUserDialog from './OrganizationUserDialog';
 import React from 'react';
-import Select from '@material-ui/core/Select';
-import TextField from '@material-ui/core/TextField';
-import axios from 'axios';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
 
-import renderList from '@fbcnms/util/renderList';
-import {getProjectTabs} from '@fbcnms/projects/projects';
+import {UserRoles} from '@fbcnms/auth/types';
+import {brightGray, white} from '@fbcnms/ui/theme/colors';
 import {makeStyles} from '@material-ui/styles';
 import {useAxios} from '@fbcnms/ui/hooks';
 import {useState} from 'react';
@@ -41,13 +33,56 @@ const useStyles = makeStyles(_ => ({
     margin: '5px 0',
     width: '100%',
   },
+  tabBar: {
+    backgroundColor: brightGray,
+    color: white,
+  },
 }));
+
+export type DialogProps = {
+  error: string,
+  user: CreateUserType,
+  organization: OrganizationPlainAttributes,
+  onUserChange: CreateUserType => void,
+  onOrganizationChange: OrganizationPlainAttributes => void,
+  // Array of networks ids
+  allNetworks: Array<string>,
+  // If true, enable all networks for an organization
+  shouldEnableAllNetworks: boolean,
+  setShouldEnableAllNetworks: boolean => void,
+};
 
 type Props = {
   onClose: () => void,
-  onSave: Organization => void,
+  onCreateOrg: (org: CreateOrgType) => void,
+  onCreateUser: (user: CreateUserType) => void,
+  // flag to display create user tab
+  addUser: boolean,
+  setAddUser: () => void,
 };
 
+type CreateUserType = {
+  email: string,
+  id?: number,
+  networkIDs: Array<string>,
+  organization?: string,
+  role: ?string,
+  tabs?: Array<string>,
+  password: string,
+  passwordConfirmation?: string,
+};
+
+type CreateOrgType = {
+  name: string,
+  networkIDs: Array<string>,
+  customDomains?: Array<string>,
+};
+/**
+ * Create Orgnization Dilaog
+ * This component displays a dialog with 2 tabs
+ * First tab: OrganizationInfoDialog, to create a new organization
+ * Second tab: OrganizationUserDialog, to create a user that belongs to the new organization
+ */
 export default function (props: Props) {
   const classes = useStyles();
   const {error, isLoading, response} = useAxios({
@@ -55,92 +90,106 @@ export default function (props: Props) {
     url: '/master/networks/async',
   });
 
-  const [name, setName] = useState('');
-  const [networkIds, setNetworkIds] = useState(new Set());
-  const [tabs, setTabs] = useState(new Set());
+  const [organization, setOrganization] = useState<OrganizationPlainAttributes>(
+    {},
+  );
+  const [currentTab, setCurrentTab] = useState(props.addUser ? 1 : 0);
   const [shouldEnableAllNetworks, setShouldEnableAllNetworks] = useState(false);
+  const [user, setUser] = useState<CreateUserType>({});
+  const [createError, setCreateError] = useState('');
+  const allNetworks = error || !response ? [] : response.data.sort();
 
   if (isLoading) {
     return <LoadingFillerBackdrop />;
   }
 
-  const allNetworks = error || !response ? [] : response.data.sort();
+  const createProps = {
+    user,
+    organization,
+    error: createError,
+    onUserChange: (user: CreateUserType) => {
+      setUser(user);
+    },
+    onOrganizationChange: (organization: OrganizationPlainAttributes) => {
+      setOrganization(organization);
+    },
+    allNetworks,
+    shouldEnableAllNetworks,
+    setShouldEnableAllNetworks,
+  };
   const onSave = async () => {
-    const response = await axios.post('/master/organization/async', {
-      name,
-      networkIDs: shouldEnableAllNetworks
-        ? allNetworks
-        : Array.from(networkIds),
-      customDomains: [], // TODO
-      tabs: Array.from(tabs),
-    });
-    props.onSave(response.data.organization);
+    if (currentTab === 0) {
+      if (!organization.name) {
+        setCreateError('Name cannot be empty');
+        return;
+      }
+      const payload = {
+        name: organization.name,
+        networkIDs: shouldEnableAllNetworks
+          ? allNetworks
+          : Array.from(organization.networkIDs || []),
+        customDomains: [], // TODO
+        // tabs: Array.from(tabs),
+      };
+
+      props.onCreateOrg(payload);
+      setCurrentTab(currentTab + 1);
+      setCreateError('');
+      props.setAddUser();
+    } else {
+      if (!user.email) {
+        setCreateError('Email cannot be empty');
+        return;
+      }
+
+      if (!user.password) {
+        setCreateError('Password cannot be empty');
+        return;
+      }
+      if (user.password != user.passwordConfirmation) {
+        setCreateError('Passwords must match');
+        return;
+      }
+
+      const payload: CreateUserType = {
+        email: user.email,
+        password: user.password,
+        role: user.role,
+        networkIDs:
+          user.role === UserRoles.SUPERUSER
+            ? []
+            : Array.from(user.networkIDs || []),
+      };
+      props.onCreateUser(payload);
+    }
   };
 
   return (
-    <Dialog open={true} onClose={props.onClose}>
+    <Dialog
+      open={true}
+      onClose={props.onClose}
+      maxWidth={'sm'}
+      fullWidth={true}>
       <DialogTitle>Add Organization</DialogTitle>
-      <DialogContent>
-        {error && <FormLabel error>{error.message}</FormLabel>}
-        <TextField
-          name="name"
-          label="Name"
-          className={classes.input}
-          value={name}
-          onChange={({target}) => setName(target.value)}
-        />
-        <FormControl className={classes.input}>
-          <InputLabel htmlFor="tabs">Accessible Tabs</InputLabel>
-          <Select
-            multiple
-            value={Array.from(tabs)}
-            onChange={({target}) => setTabs(new Set(target.value))}
-            renderValue={renderList}
-            input={<Input id="tabs" />}>
-            {getProjectTabs().map(tab => (
-              <MenuItem key={tab.id} value={tab.id}>
-                <Checkbox checked={tabs.has(tab.id)} />
-                <ListItemText primary={tab.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={shouldEnableAllNetworks}
-              onChange={({target}) =>
-                setShouldEnableAllNetworks(target.checked)
-              }
-              color="primary"
-            />
-          }
-          label="Enable All Networks"
-        />
-        {!shouldEnableAllNetworks && (
-          <FormControl className={classes.input}>
-            <InputLabel htmlFor="network_ids">Accessible Networks</InputLabel>
-            <Select
-              multiple
-              value={Array.from(networkIds)}
-              onChange={({target}) => setNetworkIds(new Set(target.value))}
-              renderValue={renderList}
-              input={<Input id="network_ids" />}>
-              {allNetworks.map(network => (
-                <MenuItem key={network} value={network}>
-                  <Checkbox checked={networkIds.has(network)} />
-                  <ListItemText primary={network} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-      </DialogContent>
+      <Tabs
+        indicatorColor="primary"
+        value={currentTab}
+        className={classes.tabBar}
+        onChange={(_, v) => setCurrentTab(v)}>
+        <Tab disabled={currentTab === 1} label={'Organization'} />
+        <Tab disabled={currentTab === 0} label={'Users'} />
+      </Tabs>
+      <>
+        {currentTab === 0 && <OrganizationInfoDialog {...createProps} />}
+        {currentTab === 1 && <OrganizationUserDialog {...createProps} />}
+      </>
       <DialogActions>
         <Button onClick={props.onClose} skin="regular">
           Cancel
         </Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button skin="comet" onClick={onSave}>
+          {currentTab === 0 ? 'Save and Continue' : 'Save'}
+        </Button>
       </DialogActions>
     </Dialog>
   );

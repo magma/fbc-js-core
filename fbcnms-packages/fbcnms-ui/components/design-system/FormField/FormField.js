@@ -163,12 +163,19 @@ FormField.defaultProps = {
 export default FormField;
 
 type AltFormFieldProps = {
+  // Label of the form field
   label: string,
+  // Content of the component (Eg, Input, OutlinedInpir, Switch)
   children?: any,
+  // If true, compact vertical padding designed for keyboard and mouse input is used
   dense?: boolean,
+  // Tooltio of the field
   tooltip?: string,
+  // SubLabel of the form field
   subLabel?: string,
+  // If true, adds a optional caption to the form field
   isOptional?: boolean,
+  // If true, the left and right padding is removed.
   disableGutters?: boolean,
 };
 
