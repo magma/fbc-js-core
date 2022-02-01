@@ -48,7 +48,7 @@ export type OrganizationPlainAttributes = {
 };
 
 type OrganizationGetters = {
-  isMasterOrg: boolean,
+  isHostOrg: boolean,
 };
 
 type OrganizationAttributes = OrganizationPlainAttributes & OrganizationGetters;
@@ -62,7 +62,7 @@ export type OrganizationType = OrganizationModel & OrganizationAttributes;
 
 export type StaticOrganizationModel = Class<OrganizationModel>;
 
-const MASTER_ORG = 'master';
+const HOST_ORG = 'host';
 
 export default (
   sequelize: Sequelize,
@@ -129,8 +129,8 @@ export default (
     },
     {
       getterMethods: {
-        isMasterOrg() {
-          return this.name === MASTER_ORG;
+        isHostOrg() {
+          return this.name === HOST_ORG;
         },
       },
     },

@@ -13,11 +13,11 @@ import type {FBCNMSRequest} from '@fbcnms/auth/access';
 
 import asyncHandler from '@fbcnms/util/asyncHandler';
 
-export const masterOrgMiddleware = asyncHandler(
+export const hostOrgMiddleware = asyncHandler(
   async (req: FBCNMSRequest, res: ExpressResponse, next: NextFunction) => {
     if (req.organization) {
       const organization = await req.organization();
-      if (organization.isMasterOrg) {
+      if (organization.isHostOrg) {
         next();
         return;
       }

@@ -58,7 +58,7 @@ export default function (props: Props) {
   const classes = useStyles();
   const {error, isLoading, response} = useAxios({
     method: 'get',
-    url: '/master/organization/async',
+    url: '/host/organization/async',
   });
   const [featureFlagStatus, setFeatureFlagStatus] = useState<FeatureFlagStatus>(
     {},
@@ -78,7 +78,7 @@ export default function (props: Props) {
 
   const onSave = async () => {
     const response = await axios.post(
-      `/master/feature/async/${props.featureFlag.id}`,
+      `/host/feature/async/${props.featureFlag.id}`,
       createPayload(featureFlagStatus, props.featureFlag),
     );
     props.onSave(response.data);
