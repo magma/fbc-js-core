@@ -56,7 +56,6 @@ module.exports = {
         '<rootDir>/fbcnms-packages/fbcnms-alarms/**/__tests__/*.js',
         // run app/server shared tests in both node and jsdom environments
         '<rootDir>/fbcnms-packages/fbcnms-util/**/__tests__/*.js',
-        '<rootDir>/fbcnms-packages/fbcnms-mobileapp/**/__tests__/*.js',
         '<rootDir>/fbcnms-projects/**/shared/**/__tests__/*.js',
       ],
       transform: {
