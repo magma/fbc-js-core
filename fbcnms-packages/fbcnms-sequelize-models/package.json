@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/sequelize-models",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "scripts": {
     "dbDataMigrate": "node -r @fbcnms/babel-register dbDataMigration.js"
   },
@@ -10,6 +10,6 @@
     "mariadb": "^2.4.2",
     "minimist": "^1.2.5",
     "pg": "^8.6.0",
-    "sequelize": "^6.12.2"
+    "sequelize": "^5.22.5"
   }
 }
