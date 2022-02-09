@@ -55,7 +55,7 @@
     "@babel/runtime": "^7.3.4"
   },
   "scripts": {
-    "eslint": "eslint --version && ./node_modules/.bin/eslint --ignore-path .eslintignore --",
+    "eslint": "eslint --version && ./node_modules/.bin/eslint --fix --ignore-path .eslintignore --",
     "jest": "echo 'Dont run jest directly, use \"yarn run test\"' && exit 1",
     "test": "NODE_ENV=test jest",
     "test:ci": "NODE_ENV=test jest -w 1",

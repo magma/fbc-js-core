@@ -68,7 +68,7 @@ export default function LabelsEditor({labels, onChange}: Props) {
 
   const handleKeyChange = React.useCallback(
     (index: number, newKey: string) => {
-      updateLabel(index, newKey, labelsState[index][1]);
+      updateLabel(index, newKey.replace(/\s/g, '_'), labelsState[index][1]);
     },
     [labelsState, updateLabel],
   );
