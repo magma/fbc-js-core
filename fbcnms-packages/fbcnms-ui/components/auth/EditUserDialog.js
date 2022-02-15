@@ -37,7 +37,7 @@ export type EditUser = {
   organization?: string,
 };
 
-type SaveUserData = {
+export type SaveUserData = {
   email: string,
   password?: string,
   role: number,
