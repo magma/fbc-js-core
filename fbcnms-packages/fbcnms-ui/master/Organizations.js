@@ -19,7 +19,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import EditUserDialog from '@fbcnms/ui/components/auth/EditUserDialog';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -35,7 +34,7 @@ import axios from 'axios';
 import withAlert from '@fbcnms/ui/components/Alert/withAlert';
 
 import {Route} from 'react-router-dom';
-import {comet, concrete} from '../theme/colors';
+import {comet, concrete} from '@fbcnms/ui/theme/colors';
 import {makeStyles} from '@material-ui/styles';
 import {useAxios, useRouter} from '@fbcnms/ui/hooks';
 import {useCallback, useEffect, useState} from 'react';
@@ -173,6 +172,7 @@ function Organizations(props: Props) {
   const [currRow, setCurrRow] = useState<OrganizationRowType>({});
   const [users, setUsers] = useState<Array<?UserType>>([]);
   const [showOnboardingDialog, setShowOnboardingDialog] = useState(false);
+  const [addUser, setAddUser] = useState(false);
   const enqueueSnackbar = useEnqueueSnackbar();
   const {error, isLoading} = useAxios({
     url: '/master/organization/async',
@@ -298,44 +298,62 @@ function Organizations(props: Props) {
           path={relativePath('/new')}
           render={() => (
             <OrganizationDialog
-              onClose={() => history.push(relativeUrl(''))}
-              onSave={org => {
-                const newOrganizations = [...organizations];
-                newOrganizations.push(org);
-                setOrganizations(newOrganizations);
+              addUser={addUser}
+              setAddUser={() => setAddUser(true)}
+              onClose={() => {
+                setAddUser(false);
                 history.push(relativeUrl(''));
+              }}
+              onCreateOrg={org => {
+                let newOrg = null;
+                axios
+                  .post('/master/organization/async', org)
+                  .then(() => {
+                    enqueueSnackbar('Organization added successfully', {
+                      variant: 'success',
+                    });
+                    axios
+                      .get(`/master/organization/async/${org.name}`)
+                      .then(resp => {
+                        newOrg = resp.data.organization;
+                        if (newOrg) {
+                          setOrganizations([...organizations, newOrg]);
+                          setAddingUserFor(newOrg);
+                        }
+                      });
+                  })
+                  .catch(error => {
+                    setAddUser(false);
+                    history.push(relativeUrl(''));
+                    enqueueSnackbar(error?.response?.data?.error || error, {
+                      variant: 'error',
+                    });
+                  });
+              }}
+              onCreateUser={user => {
+                axios
+                  .post(
+                    `/master/organization/async/${
+                      addingUserFor?.name || ''
+                    }/add_user`,
+                    user,
+                  )
+                  .then(() => {
+                    enqueueSnackbar('User added successfully', {
+                      variant: 'success',
+                    });
+                    setAddingUserFor(null);
+                    history.push(relativeUrl(''));
+                  })
+                  .catch(error => {
+                    enqueueSnackbar(error?.response?.data?.error || error, {
+                      variant: 'error',
+                    });
+                  });
               }}
             />
           )}
         />
-        {addingUserFor && (
-          <EditUserDialog
-            open={true}
-            ssoEnabled={!!addingUserFor.ssoEntrypoint}
-            onClose={() => setAddingUserFor(null)}
-            onEditUser={() => {}}
-            editingUser={null}
-            allNetworkIDs={addingUserFor.networkIDs}
-            onCreateUser={user => {
-              axios
-                .post(
-                  `/master/organization/async/${addingUserFor.name}/add_user`,
-                  user,
-                )
-                .then(() => {
-                  enqueueSnackbar('User added successfully', {
-                    variant: 'success',
-                  });
-                  setAddingUserFor(null);
-                })
-                .catch(error =>
-                  enqueueSnackbar(error?.response?.data?.error || error, {
-                    variant: 'error',
-                  }),
-                );
-            }}
-          />
-        )}
       </Grid>
     </div>
   );

@@ -11,7 +11,7 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel ./ -d lib/",
+    "build": "babel ./ -d lib/ --ignore '**/__tests__/*.js'",
     "prepublish": "yarn run build",
     "dev": "yarn run yalc-push && chokidar \"components/**/*.js\" \"hooks/**/*.js\" \"util/**/*.js\" -c \"yarn run yalc-push\"",
     "yalc-push": "yalc push"
