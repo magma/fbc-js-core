@@ -65,6 +65,34 @@ test('typing into a key field edits the key of a label', () => {
     'testKey2-edited': 'testVal2',
   });
 });
+
+test('spaces in the key field are replaced by underscores', () => {
+  const {getByDisplayValue} = render(
+    <LabelsEditor
+      {...commonProps}
+      labels={{
+        testKey1: 'testVal1',
+        testKey2: 'testVal2',
+      }}
+    />,
+  );
+
+  act(() => {
+    fireEvent.change(getByDisplayValue('testKey1'), {
+      target: {value: 'testKey1 '},
+    });
+  });
+  act(() => {
+    fireEvent.change(getByDisplayValue('testKey2'), {
+      target: {value: 'testKey2 edited'},
+    });
+  });
+  expect(commonProps.onChange).toHaveBeenCalledWith({
+    testKey1_: 'testVal1',
+    testKey2_edited: 'testVal2',
+  });
+});
+
 test('typing into a value field edits the value of a label', () => {
   const {getByDisplayValue} = render(
     <LabelsEditor
