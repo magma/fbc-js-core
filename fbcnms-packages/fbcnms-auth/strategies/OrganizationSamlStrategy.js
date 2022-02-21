@@ -9,7 +9,7 @@
  */
 
 import {AccessRoles} from '../roles';
-import {MultiSamlStrategy} from 'passport-saml';
+import {MultiSamlStrategy} from 'passport-saml'; // compatibility with breaking change in 3.1.0
 import {User} from '@fbcnms/sequelize-models';
 
 import {getUserFromRequest} from '../util';
