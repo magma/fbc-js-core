@@ -17,6 +17,9 @@ import TableActionDialog from './table/TableActionDialog';
 import TableAddButton from './table/TableAddButton';
 import axios from 'axios';
 import useRouter from '@fbcnms/ui/hooks/useRouter';
+import {
+  PREDEFINED_RULE_IMPORT_STATE,
+} from './rules/RuleInterface';
 import {Parse} from './prometheus/PromQLParser';
 import {makeStyles} from '@material-ui/styles';
 import {useAlarmContext} from './AlarmContext';
@@ -71,7 +74,10 @@ export default function AlertRules<TRuleUnion>() {
     lastRefreshTime,
   });
   const {predefinedRules} = useLoadPredefinedRules({rules});
-  const tableData = [].concat(rules ?? [], predefinedRules ?? []);
+  const tableData: Array<GenericRule<*>> = [].concat(
+    rules ?? [],
+    predefinedRules ?? [],
+  );
 
   const loadMatchingAlerts = React.useCallback(async () => {
     try {
@@ -156,6 +162,25 @@ export default function AlertRules<TRuleUnion>() {
     [],
   );
 
+  const tableOptions = React.useMemo(
+    () => ({
+      rowStyle: ({predefinedRuleState}: GenericRule<*>) => {
+        let backgroundColor: ?string = null;
+        switch (predefinedRuleState) {
+          case PREDEFINED_RULE_IMPORT_STATE.NEEDS_IMPORT:
+            backgroundColor = 'grey';
+            break;
+          case PREDEFINED_RULE_IMPORT_STATE.UPGRADE:
+            backgroundColor = 'blue';
+            break;
+        }
+        return {
+          backgroundColor,
+        };
+      },
+    }),
+    [],
+  );
   if (isAddEditAlert) {
     return (
       <AddEditRule
@@ -170,29 +195,39 @@ export default function AlertRules<TRuleUnion>() {
     );
   }
 
+  const menuItems = [{
+      name: 'View',
+      handleFunc: () => handleView(),
+    },
+    {
+      name: 'Edit',
+      handleFunc: () => handleEdit(),
+    },
+    {
+      name: 'Delete',
+      handleFunc: () => {
+        handleDelete();
+      },
+    }];
+
+  if(selectedRow?.predefinedRuleState != null) {
+    if(selectedRow.predefinedRuleState === PREDEFINED_RULE_IMPORT_STATE.UPGRADE){
+      menuItems.unshift({name:"upgrade rule",handleFunc:() => {}})
+    }else if (selectedRow.predefinedRuleState === PREDEFINED_RULE_IMPORT_STATE.NEEDS_IMPORT){
+      menuItems.unshift({name:"import rule",handleFunc:() => {}})
+    }
+  }
+
+
   return (
     <Grid className={classes.root}>
       <SimpleTable
         onRowClick={row => setSelectedRow(row)}
         columnStruct={columns}
-        tableData={rules || []}
+        options={tableOptions}
+        tableData={tableData}
         dataTestId="alert-rules"
-        menuItems={[
-          {
-            name: 'View',
-            handleFunc: () => handleView(),
-          },
-          {
-            name: 'Edit',
-            handleFunc: () => handleEdit(),
-          },
-          {
-            name: 'Delete',
-            handleFunc: () => {
-              handleDelete();
-            },
-          },
-        ]}
+        menuItems={menuItems}
       />
       {isLoading && (
         <div className={classes.loading}>
@@ -249,27 +284,21 @@ function useLoadPredefinedRules({
 }): {predefinedRules: Array<GenericRule<*>>} {
   const {ruleMap, getNetworkId} = useAlarmContext();
   const networkId = getNetworkId ? getNetworkId() ?? '' : '';
-  const [allPredefinedRules, setAllPredefinedRules] = React.useState([]);
+  const [allPredefinedRules, setAllPredefinedRules] = React.useState<
+    Array<GenericRule<*>>,
+  >([]);
   React.useEffect(() => {
     (async () => {
       let responses: Array<GenericRule<*>> = [];
-      for (const [ruleType] of Object.keys(ruleMap)) {
+      for (const ruleType of Object.keys(ruleMap)) {
         const {getPredefinedRules} = ruleMap[ruleType];
         if (typeof getPredefinedRules === 'function') {
           const response = await getPredefinedRules({networkId});
           responses = responses.concat(response);
         }
-        setAllPredefinedRules(responses);
       }
+      setAllPredefinedRules(responses);
     })();
   }, []);
-  const unimportedPredefinedRules = React.useMemo(() => {
-    const existing = rules.reduce((set, rule) => {
-      set?.add(rule.name);
-      return set;
-    }, new Set());
-    return allPredefinedRules?.filter(rule => !existing.has(rule.name)) ?? [];
-  }, [rules, allPredefinedRules]);
-
-  return {predefinedRules: unimportedPredefinedRules ?? []};
+  return {predefinedRules: allPredefinedRules ?? []};
 }

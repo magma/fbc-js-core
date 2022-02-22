@@ -268,6 +268,7 @@ export default function SimpleTable<T>(props: ActionTableProps<T>) {
           filtering: true,
           // hide table title and toolbar
           toolbar: false,
+          ...(props.options || {}: any),
         }}
         localization={{
           // hide 'Actions' in table header

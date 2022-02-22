@@ -9,7 +9,10 @@
  */
 
 import PrometheusEditor from './PrometheusEditor';
-
+import {
+  PREDEFINED_RULE_IMPORT_STATE,
+  PREDEFINED_RULE_VERSION_LABEL,
+} from '../../rules/RuleInterface';
 import type {AlertConfig} from '../../AlarmAPIType';
 import type {ApiUtil} from '../../AlarmsApi';
 import type {GenericRule, RuleInterfaceMap} from '../../rules/RuleInterface';
@@ -37,8 +40,43 @@ export default function getPrometheusRuleInterface({
       deleteRule: params => apiUtil.deleteAlertRule(params),
       getPredefinedRules: async req => {
         if (typeof apiUtil.getPrometheusPredefinedRules === 'function') {
-          const rules = await apiUtil.getPrometheusPredefinedRules(req);
-          return rules.map(rule => promAlertConfigToGenericRule(rule));
+          const predefined = await apiUtil.getPrometheusPredefinedRules(req);
+          // getAlertRules fetches only the prometheus alert rules
+          const existingRules = await apiUtil.getAlertRules(req);
+          const existing = existingRules.reduce((_rules, rule) => {
+            _rules?.set(rule.alert, rule);
+            return _rules;
+          }, new Map<string, AlertConfig>());
+          return predefined.reduce((_rules, rule) => {
+            const mappedRule = promAlertConfigToGenericRule(rule);
+            const existingRule = existing.get(mappedRule.name);
+            if (existingRule == null) {
+              mappedRule.predefinedRuleState =
+                PREDEFINED_RULE_IMPORT_STATE.NEEDS_IMPORT;
+              _rules.push(mappedRule);
+            } else {
+              const existingVer = parseInt(
+                existingRule.labels
+                  ? existingRule.labels[PREDEFINED_RULE_VERSION_LABEL]
+                  : null,
+              );
+              const newVer = parseInt(
+                rule.labels ? rule.labels[PREDEFINED_RULE_VERSION_LABEL] : null,
+              );
+              if (
+                !isNaN(existingVer) &&
+                !isNaN(newVer) &&
+                newVer > existingVer
+              ) {
+                mappedRule.predefinedRuleState =
+                  PREDEFINED_RULE_IMPORT_STATE.UPGRADE;
+              } else {
+                mappedRule.predefinedRuleState =
+                  PREDEFINED_RULE_IMPORT_STATE.READY;
+              }
+            }
+            return _rules;
+          }, []);
         }
         return [];
       },

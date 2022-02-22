@@ -26,6 +26,24 @@ export type AlertViewerProps = {
   alert: FiringAlarm,
 };
 
+export const PREDEFINED_RULE_VERSION_LABEL = 'nms-rule-version';
+
+/**
+ * The UI fetches installed alert rules from prometheus and predefined
+ * alert rules. The UI allows users to import predefined alert rules and upgrade
+ * them when they change.
+ */
+export const PREDEFINED_RULE_IMPORT_STATE = {
+  // A user-defined alert rule (not predefined)
+  NONE: 'NONE',
+  // A predefined alert rule which has been imported and is up-to-date
+  READY: 'READY',
+  // A predefined alert which has been imported and can be upgraded to a new version
+  UPGRADE: 'UPGRADE',
+  // A predefined alert which a user has not imported
+  NEEDS_IMPORT: 'NEEDS_IMPORT',
+};
+
 /**
  * Rules should be mapped to the generic rule for rendering in tables and
  * passing to shared components. The raw rule should be passed to
@@ -44,6 +62,7 @@ export type GenericRule<TRule> = {
   ruleType: string,
   // The original rule which this generic rule is mapped from
   rawRule: TRule,
+  predefinedRuleState?: $Keys<typeof PREDEFINED_RULE_IMPORT_STATE>,
 };
 
 export type RuleInterface<TRule> = {|
