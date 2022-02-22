@@ -120,6 +120,40 @@ export default function AlertRules<TRuleUnion>() {
     setIsViewAlertModalOpen(false);
     setMatchingAlertsCount(null);
   }, [setIsViewAlertModalOpen, setMatchingAlertsCount]);
+  const columns = React.useMemo(
+    () => [
+      {
+        title: 'Name',
+        field: 'name',
+      },
+      {
+        title: 'Severity',
+        field: 'severity',
+        render: currRow => <SeverityIndicator severity={currRow.severity} />,
+      },
+      {
+        title: 'Fire Alert When',
+        field: 'fireAlertWhen',
+        render: currRow => {
+          try {
+            const exp = Parse(currRow.expression);
+            if (exp) {
+              const metricName = exp.lh.selectorName?.toUpperCase() || '';
+              const operator = exp.operator?.toString() || '';
+              const value = exp.rh.value?.toString() || '';
+              return `${metricName} ${operator} ${value} for ${currRow.period}`;
+            }
+          } catch {}
+          return 'error';
+        },
+      },
+      {
+        title: 'Description',
+        field: 'description',
+      },
+    ],
+    [],
+  );
 
   if (isAddEditAlert) {
     return (
@@ -139,39 +173,7 @@ export default function AlertRules<TRuleUnion>() {
     <Grid className={classes.root}>
       <SimpleTable
         onRowClick={row => setSelectedRow(row)}
-        columnStruct={[
-          {
-            title: 'Name',
-            field: 'name',
-          },
-          {
-            title: 'Severity',
-            field: 'severity',
-            render: currRow => (
-              <SeverityIndicator severity={currRow.severity} />
-            ),
-          },
-          {
-            title: 'Fire Alert When',
-            field: 'fireAlertWhen',
-            render: currRow => {
-              try {
-                const exp = Parse(currRow.expression);
-                if (exp) {
-                  const metricName = exp.lh.selectorName?.toUpperCase() || '';
-                  const operator = exp.operator?.toString() || '';
-                  const value = exp.rh.value?.toString() || '';
-                  return `${metricName} ${operator} ${value} for ${currRow.period}`;
-                }
-              } catch {}
-              return 'error';
-            },
-          },
-          {
-            title: 'Description',
-            field: 'description',
-          },
-        ]}
+        columnStruct={columns}
         tableData={rules || []}
         dataTestId="alert-rules"
         menuItems={[
