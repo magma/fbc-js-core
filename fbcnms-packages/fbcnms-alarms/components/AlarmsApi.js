@@ -89,4 +89,10 @@ export type ApiUtil = {|
 
   getAlertmanagerTenancy: (req: ApiRequest) => Promise<TenancyConfig>,
   getPrometheusTenancy: (req: ApiRequest) => Promise<TenancyConfig>,
+  /**
+   * Fetch predefined prometheus alert rules
+   */
+  getPrometheusPredefinedRules?: (
+    req: ApiRequest,
+  ) => Promise<Array<AlertConfig>>,
 |};

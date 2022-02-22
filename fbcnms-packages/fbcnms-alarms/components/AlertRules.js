@@ -70,6 +70,8 @@ export default function AlertRules<TRuleUnion>() {
     ruleMap,
     lastRefreshTime,
   });
+  const {predefinedRules} = useLoadPredefinedRules({rules});
+  const tableData = [].concat(rules ?? [], predefinedRules ?? []);
 
   const loadMatchingAlerts = React.useCallback(async () => {
     try {
@@ -115,7 +117,6 @@ export default function AlertRules<TRuleUnion>() {
       setLastRefreshTime(new Date().toLocaleString());
     }
   }, [match.params.networkId, ruleMap, selectedRow, snackbars]);
-
   const handleViewAlertModalClose = React.useCallback(() => {
     setIsViewAlertModalOpen(false);
     setMatchingAlertsCount(null);
@@ -237,4 +238,38 @@ export default function AlertRules<TRuleUnion>() {
       />
     </Grid>
   );
+}
+
+/*
+ * Fetches predefined alert rules and filters out rules which have already been
+ * imported.
+ */
+function useLoadPredefinedRules({
+  rules,
+}): {predefinedRules: Array<GenericRule<*>>} {
+  const {ruleMap, getNetworkId} = useAlarmContext();
+  const networkId = getNetworkId ? getNetworkId() ?? '' : '';
+  const [allPredefinedRules, setAllPredefinedRules] = React.useState([]);
+  React.useEffect(() => {
+    (async () => {
+      let responses: Array<GenericRule<*>> = [];
+      for (const [ruleType] of Object.keys(ruleMap)) {
+        const {getPredefinedRules} = ruleMap[ruleType];
+        if (typeof getPredefinedRules === 'function') {
+          const response = await getPredefinedRules({networkId});
+          responses = responses.concat(response);
+        }
+        setAllPredefinedRules(responses);
+      }
+    })();
+  }, []);
+  const unimportedPredefinedRules = React.useMemo(() => {
+    const existing = rules.reduce((set, rule) => {
+      set?.add(rule.name);
+      return set;
+    }, new Set());
+    return allPredefinedRules?.filter(rule => !existing.has(rule.name)) ?? [];
+  }, [rules, allPredefinedRules]);
+
+  return {predefinedRules: unimportedPredefinedRules ?? []};
 }

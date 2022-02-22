@@ -202,7 +202,7 @@ export default function SimpleTable<T>(props: ActionTableProps<T>) {
   const actionTableJSX = [];
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = (event, row: T) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorEl(event.target);
     if (props.onRowClick) {
       props.onRowClick(row);
     }

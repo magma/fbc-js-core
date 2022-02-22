@@ -30,17 +30,32 @@ export default function getPrometheusRuleInterface({
        */
       getRules: async req => {
         const rules = await apiUtil.getAlertRules(req);
-        return rules.map<GenericRule<AlertConfig>>(rule => ({
-          name: rule.alert,
-          description: rule.annotations?.description || '',
-          severity: rule.labels?.severity || '',
-          period: rule.for || '',
-          expression: rule.expr,
-          ruleType: PROMETHEUS_RULE_TYPE,
-          rawRule: rule,
-        }));
+        return rules.map<GenericRule<AlertConfig>>(rule =>
+          promAlertConfigToGenericRule(rule),
+        );
       },
       deleteRule: params => apiUtil.deleteAlertRule(params),
+      getPredefinedRules: async req => {
+        if (typeof apiUtil.getPrometheusPredefinedRules === 'function') {
+          const rules = await apiUtil.getPrometheusPredefinedRules(req);
+          return rules.map(rule => promAlertConfigToGenericRule(rule));
+        }
+        return [];
+      },
     },
+  };
+}
+
+function promAlertConfigToGenericRule(
+  alertConfig: AlertConfig,
+): GenericRule<AlertConfig> {
+  return {
+    name: alertConfig.alert,
+    description: alertConfig.annotations?.description || '',
+    severity: alertConfig.labels?.severity || '',
+    period: alertConfig.for || '',
+    expression: alertConfig.expr,
+    ruleType: PROMETHEUS_RULE_TYPE,
+    rawRule: alertConfig,
   };
 }

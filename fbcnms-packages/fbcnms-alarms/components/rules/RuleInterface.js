@@ -64,6 +64,7 @@ export type RuleInterface<TRule> = {|
    */
   getRules: (req: ApiRequest) => Promise<Array<GenericRule<TRule>>>,
   deleteRule: (req: {ruleName: string} & ApiRequest) => Promise<void>,
+  getPredefinedRules?: (req: ApiRequest) => Promise<Array<GenericRule<TRule>>>,
 |};
 
 export type RuleInterfaceMap<TUnion> = {
