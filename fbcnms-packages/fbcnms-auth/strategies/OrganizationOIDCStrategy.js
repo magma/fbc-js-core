@@ -33,7 +33,7 @@ export default function OrganizationOIDCStrategy(config: Config) {
     userInfo: OpenidUserInfoClaims,
     done: (error: Error | void, user?: User) => void,
   ) => {
-    const email = userInfo.email;
+    const email = userInfo.email || userInfo.attributes.email;
     const organization = await req.organization();
     const ssoDefaultNetworkIDs = organization.ssoDefaultNetworkIDs;
     try {
@@ -46,7 +46,7 @@ export default function OrganizationOIDCStrategy(config: Config) {
           email: email.toLowerCase(),
           password: Math.random().toString(36),
           // Hardcoded role for now, should be configurable
-          role: AccessRoles.SUPERUSER,
+          role: AccessRoles.USER,
           ssoDefaultNetworkIDs,
         });
         user = await User.create(createArgs);
@@ -75,6 +75,7 @@ export default function OrganizationOIDCStrategy(config: Config) {
           path: `${config.urlPrefix}/login/oidc/callback`,
           passReqToCallback: true,
           params: {
+            scope: ['openid email'],
             redirect_uri:
               `https://${host}${config.urlPrefix}/login/oidc/callback?to=` +
               encodeURIComponent(redirectTo),
