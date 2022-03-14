@@ -10,7 +10,6 @@
 
 import type {DialogProps} from './OrganizationDialog';
 
-import DialogContent from '@material-ui/core/DialogContent';
 import FormLabel from '@material-ui/core/FormLabel';
 import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -19,8 +18,21 @@ import OutlinedInput from '@material-ui/core/OutlinedInput';
 import React from 'react';
 import Select from '@material-ui/core/Select';
 
-import {AltFormField} from '@fbcnms/ui/components/design-system/FormField/FormField';
+import {AltFormField} from '../components/design-system/FormField/FormField';
 import {UserRoles} from '@fbcnms/auth/types';
+import {makeStyles} from '@material-ui/styles';
+
+const useStyles = makeStyles(_ => ({
+  addButton: {
+    minWidth: '150px',
+  },
+  selectItem: {
+    // color: '',
+    fontSize: '12px',
+    fontFamily: '"Inter", sans-serif',
+    fontWeight: '600',
+  },
+}));
 
 /**
  * Create User Tab
@@ -28,76 +40,84 @@ import {UserRoles} from '@fbcnms/auth/types';
  */
 export default function OrganizationUserDialog(props: DialogProps) {
   const {user} = props;
+  const classes = useStyles();
 
   return (
-    <DialogContent>
-      <List>
-        {props.error && (
-          <AltFormField label={''}>
-            <FormLabel error>{props.error}</FormLabel>
-          </AltFormField>
-        )}
-        <AltFormField disableGutters label={'Email'}>
-          <OutlinedInput
-            data-testid="name"
-            placeholder="Email"
-            fullWidth={true}
-            value={user.email}
-            onChange={({target}) => {
-              props.onUserChange({...user, email: target.value});
-            }}
-          />
+    <List>
+      {props.error && (
+        <AltFormField label={''}>
+          <FormLabel error>{props.error}</FormLabel>
         </AltFormField>
-        <AltFormField disableGutters label={'Password'}>
-          <OutlinedInput
-            data-testid="name"
-            placeholder="Enter Password"
-            fullWidth={true}
-            value={user.password}
-            onChange={({target}) => {
-              props.onUserChange({...user, password: target.value});
-            }}
-          />
-        </AltFormField>
-        <AltFormField disableGutters label={'Confirm Password'}>
-          <OutlinedInput
-            data-testid="name"
-            placeholder="Enter Password Confirmation"
-            fullWidth={true}
-            value={user.passwordConfirmation}
-            onChange={({target}) => {
-              props.onUserChange({...user, passwordConfirmation: target.value});
-            }}
-          />
-        </AltFormField>
-        <AltFormField
-          disableGutters
-          label={'Role'}
-          subLabel={
-            'The role decides permissions that the user has to areas and features '
-          }>
-          <Select
-            fullWidth={true}
-            variant={'outlined'}
-            value={user.role ?? 0}
-            onChange={({target}) => {
-              props.onUserChange({...user, role: target.value});
-            }}
-            input={<OutlinedInput id="direction" />}>
-            <MenuItem key={UserRoles.USER} value={UserRoles.USER}>
-              <ListItemText primary={'User'} />
-            </MenuItem>
-            <MenuItem
-              key={UserRoles.READ_ONLY_USER}
-              value={UserRoles.READ_ONLY_USER}>
-              <ListItemText primary={'Read Only User'} />
-            </MenuItem>
-            <MenuItem key={UserRoles.SUPERUSER} value={UserRoles.SUPERUSER}>
-              <ListItemText primary={'SuperUser'} />
-            </MenuItem>
-          </Select>
-        </AltFormField>
-      </List>
-    </DialogContent>
+      )}
+      <AltFormField disableGutters label={'Email'}>
+        <OutlinedInput
+          data-testid="name"
+          placeholder="Email"
+          fullWidth={true}
+          value={user.email}
+          onChange={({target}) => {
+            props.onUserChange({...user, email: target.value});
+          }}
+        />
+      </AltFormField>
+      <AltFormField disableGutters label={'Password'}>
+        <OutlinedInput
+          data-testid="name"
+          placeholder="Enter Password"
+          fullWidth={true}
+          value={user.password}
+          onChange={({target}) => {
+            props.onUserChange({...user, password: target.value});
+          }}
+        />
+      </AltFormField>
+      <AltFormField disableGutters label={'Confirm Password'}>
+        <OutlinedInput
+          data-testid="name"
+          placeholder="Enter Password Confirmation"
+          fullWidth={true}
+          value={user?.passwordConfirmation}
+          onChange={({target}) => {
+            props.onUserChange({...user, passwordConfirmation: target.value});
+          }}
+        />
+      </AltFormField>
+      <AltFormField
+        disableGutters
+        label={'Role'}
+        subLabel={
+          'The role decides permissions that the user has to areas and features '
+        }>
+        <Select
+          fullWidth={true}
+          variant={'outlined'}
+          value={user.role ?? 0}
+          onChange={({target}) => {
+            props.onUserChange({...user, role: target.value});
+          }}
+          input={<OutlinedInput id="direction" />}>
+          <MenuItem key={UserRoles.USER} value={UserRoles.USER}>
+            <ListItemText
+              classes={{primary: classes.selectItem}}
+              primary={'User'}
+            />
+          </MenuItem>
+          <MenuItem
+            key={UserRoles.READ_ONLY_USER}
+            value={UserRoles.READ_ONLY_USER}>
+            <ListItemText
+              classes={{primary: classes.selectItem}}
+              primary={'Read Only User'}
+            />
+          </MenuItem>
+          <MenuItem key={UserRoles.SUPERUSER} value={UserRoles.SUPERUSER}>
+            <ListItemText
+              classes={{primary: classes.selectItem}}
+              primary={'SuperUser'}
+            />
+          </MenuItem>
+        </Select>
+      </AltFormField>
+    </List>
   );
 }
