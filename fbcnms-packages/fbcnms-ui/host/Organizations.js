@@ -307,13 +307,13 @@ function Organizations(props: Props) {
               onCreateOrg={org => {
                 let newOrg = null;
                 axios
-                  .post('/master/organization/async', org)
+                  .post('/host/organization/async', org)
                   .then(() => {
                     enqueueSnackbar('Organization added successfully', {
                       variant: 'success',
                     });
                     axios
-                      .get(`/master/organization/async/${org.name}`)
+                      .get(`/host/organization/async/${org.name}`)
                       .then(resp => {
                         newOrg = resp.data.organization;
                         if (newOrg) {
@@ -333,7 +333,7 @@ function Organizations(props: Props) {
               onCreateUser={user => {
                 axios
                   .post(
-                    `/master/organization/async/${
+                    `/host/organization/async/${
                       addingUserFor?.name || ''
                     }/add_user`,
                     user,
