@@ -80,7 +80,6 @@ const useStyles = makeStyles(_ => ({
       color: comet,
     },
   },
-
   subtitle: {
     margin: '16px 0',
   },
