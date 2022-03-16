@@ -59,7 +59,11 @@ const useStyles = makeStyles(() => ({
     marginLeft: '8px',
   },
   label: {
-    fontSize: '16px',
+    fontSize: '14px',
+    fontFamily: 'Inter',
+    fontStyle: 'normal',
+    fontWeight: '500',
+    lineHeight: '20px',
   },
   children: {
     padding: '8px 0',
