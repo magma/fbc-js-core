@@ -3,7 +3,7 @@
   "description": "UI components for alert configuration of prometheus and alertmanager.",
   "author": "Facebook Connectivity",
   "license": "BSD-2-Clause",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/facebookincubator/fbc-js-core.git",
@@ -17,7 +17,7 @@
     "yalc-push": "yalc push"
   },
   "dependencies": {
-    "@fbcnms/ui": "^1.2.1",
+    "@fbcnms/ui": "^2.0.0",
     "classnames": "^2.2.5",
     "copy-to-clipboard": "^3.0.8",
     "moment": "^2.24.0",
