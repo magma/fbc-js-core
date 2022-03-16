@@ -87,7 +87,7 @@ export default function (props: Props) {
   const classes = useStyles();
   const {error, isLoading, response} = useAxios({
     method: 'get',
-    url: '/master/networks/async',
+    url: '/host/networks/async',
   });
 
   const [organization, setOrganization] = useState<OrganizationPlainAttributes>(

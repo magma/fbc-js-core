@@ -151,7 +151,7 @@ async function getUsers(
   const requests = organizations.map(async organization => {
     try {
       const response = await axios.get(
-        `/master/organization/async/${organization.name}/users`,
+        `/host/organization/async/${organization.name}/users`,
       );
       return response.data;
     } catch (error) {}
@@ -175,7 +175,7 @@ function Organizations(props: Props) {
   const [addUser, setAddUser] = useState(false);
   const enqueueSnackbar = useEnqueueSnackbar();
   const {error, isLoading} = useAxios({
-    url: '/master/organization/async',
+    url: '/host/organization/async',
     onResponse: useCallback(res => {
       setOrganizations(res.data.organizations);
       if (res.data.organizations.length < 3) {
@@ -198,7 +198,7 @@ function Organizations(props: Props) {
       .confirm('Are you sure you want to delete this org?')
       .then(async confirm => {
         if (!confirm) return;
-        await axios.delete(`/master/organization/async/${org.id}`);
+        await axios.delete(`/host/organization/async/${org.id}`);
         const newOrganizations = organizations.filter(
           organization => organization.id !== org.id,
         );

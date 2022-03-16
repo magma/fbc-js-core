@@ -49,7 +49,7 @@ export default function Features() {
   const {history} = useRouter();
   const [featureFlags, setFeatureFlags] = useState<?(FeatureFlag[])>(null);
   useEffect(() => {
-    axios.get('/master/feature/async').then(({data}) => setFeatureFlags(data));
+    axios.get('/host/feature/async').then(({data}) => setFeatureFlags(data));
   }, []);
 
   if (!featureFlags) {

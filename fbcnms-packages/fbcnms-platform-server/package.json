@@ -1,12 +1,12 @@
 {
   "name": "@fbcnms/platform-server",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "dependencies": {
-    "@fbcnms/auth": "^0.1.6",
+    "@fbcnms/auth": "^0.2.0",
     "@fbcnms/babel-register": "^0.1.0",
     "@fbcnms/express-middleware": "^0.1.5",
     "@fbcnms/logging": "^0.1.0",
-    "@fbcnms/sequelize-models": "^0.1.11",
+    "@fbcnms/sequelize-models": "^0.2.0",
     "@fbcnms/types": "^0.1.10",
     "@fbcnms/util": "^0.1.0",
     "add": "^2.0.6",

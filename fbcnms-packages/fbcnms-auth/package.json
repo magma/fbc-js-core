@@ -1,8 +1,8 @@
 {
   "name": "@fbcnms/auth",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "dependencies": {
-    "@fbcnms/sequelize-models": "^0.1.11",
+    "@fbcnms/sequelize-models": "^0.2.0",
     "@fbcnms/webpack-config": "^0.1.0",
     "email-validator": "^2.0.4",
     "openid-client": "2.4.5",

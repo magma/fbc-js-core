@@ -238,7 +238,7 @@ declare class express$Router<
 
 /*
 With flow-bin ^0.59, express app.listen() is deemed to return any and fails flow type coverage.
-Which is ironic because https://github.com/facebook/flow/blob/master/Changelog.md#misc-2 (release notes for 0.59)
+Which is ironic because https://github.com/facebook/flow/blob/main/Changelog.md#misc-2 (release notes for 0.59)
 says "Improves typings for Node.js HTTP server listen() function."  See that?  IMPROVES!
 To work around this issue, we changed Server to ?Server here, so that our invocations of express.listen() will
 not be deemed to lack type coverage.

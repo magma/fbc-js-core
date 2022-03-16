@@ -99,7 +99,7 @@ export default function OrganizationEdit(props: Props) {
 
   const orgRequest = useAxios<null, {organization: Organization}>({
     method: 'get',
-    url: '/master/organization/async/' + match.params.name,
+    url: '/host/organization/async/' + match.params.name,
     onResponse: useCallback(res => {
       const {organization} = res.data;
       setName(organization.name);
@@ -118,7 +118,7 @@ export default function OrganizationEdit(props: Props) {
 
   const networksRequest = useAxios({
     method: 'get',
-    url: '/master/networks/async',
+    url: '/host/networks/async',
   });
 
   useEffect(() => {
@@ -147,7 +147,7 @@ export default function OrganizationEdit(props: Props) {
 
   const onSave = () => {
     axios
-      .put('/master/organization/async/' + match.params.name, {
+      .put('/host/organization/async/' + match.params.name, {
         name,
         tabs: Array.from(tabs),
         networkIDs: shouldEnableAllNetworks

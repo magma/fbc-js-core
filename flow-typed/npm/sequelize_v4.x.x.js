@@ -2693,7 +2693,7 @@ declare module "sequelize" {
 
     /**
      * Group by. It is not mentioned in sequelize's JSDoc, but mentioned in docs.
-     * https://github.com/sequelize/sequelize/blob/master/docs/docs/models-usage.md#user-content-manipulating-the-dataset-with-limit-offset-order-and-group
+     * https://github.com/sequelize/sequelize/blob/main/docs/manual/core-concepts/model-querying-basics.md#ordering-and-grouping
      */
     group?: string | string[] | Object,
 
