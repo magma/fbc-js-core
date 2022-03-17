@@ -9,11 +9,11 @@
  */
 
 import {useCallback, useContext, useEffect, useState} from 'react';
-import {useRouteMatch} from 'react-router';
+import {useRouteMatch} from 'react-router-dom';
 
 // eslint-disable-next-line no-warning-comments
 // $FlowFixMe - use react-router hooks
-import {__RouterContext as RouterContext} from 'react-router';
+import {__RouterContext as RouterContext} from 'react-router-dom';
 
 export const useRelativeUrl = () => {
   const {url} = useRouteMatch();

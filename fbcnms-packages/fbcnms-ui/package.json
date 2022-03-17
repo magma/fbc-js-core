@@ -1,6 +1,6 @@
 {
   "name": "@fbcnms/ui",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "peerDependencies": {
     "@material-table/core": "^4.3.6",
     "@material-ui/core": "^4.0.0",

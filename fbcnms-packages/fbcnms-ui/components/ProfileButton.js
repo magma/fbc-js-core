@@ -18,7 +18,7 @@ import Text from './design-system/Text';
 import classNames from 'classnames';
 import {Events, GeneralLogger} from '@fbcnms/ui/utils/Logging';
 import {makeStyles} from '@material-ui/styles';
-import {useHistory} from 'react-router';
+import {useHistory} from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   accountButton: {
