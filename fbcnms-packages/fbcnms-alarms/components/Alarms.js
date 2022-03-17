@@ -113,9 +113,10 @@ export default function Alarms<TRuleUnion>(props: Props<TRuleUnion>) {
   const tabStyles = useTabStyles();
   const {match, location} = useRouter();
 
-  const currentTabMatch = matchPath(location.pathname, {
-    path: `${match.path}/:tabName`,
-  });
+  const currentTabMatch = matchPath(
+    location.pathname,
+    `${match.path}/:tabName`,
+  );
   const mergedRuleMap = useMergedRuleMap<TRuleUnion>({ruleMap, apiUtil});
 
   const disabledTabSet = React.useMemo(() => {
