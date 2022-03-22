@@ -16,6 +16,7 @@ import type {WithAlert} from '@fbcnms/ui/components/Alert/withAlert';
 import ActionTable from '../components/ActionTable';
 import BusinessIcon from '@material-ui/icons/Business';
 import Button from '@fbcnms/ui/components/design-system/Button';
+import CloseIcon from '@material-ui/icons/Close';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -23,13 +24,16 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Grid from '@material-ui/core/Grid';
+import Link from '@material-ui/core/Link';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import LoadingFiller from '@fbcnms/ui/components/LoadingFiller';
 import OrganizationDialog from './OrganizationDialog';
+import Paper from '@material-ui/core/Paper';
 import PersonAdd from '@material-ui/icons/PersonAdd';
 import PersonIcon from '@material-ui/icons/Person';
+import Popper from '@material-ui/core/Popper';
 import React from 'react';
 import Text from '../components/design-system/Text';
 import axios from 'axios';
@@ -60,7 +64,7 @@ const useStyles = makeStyles(_ => ({
     display: 'flex',
     justifyContent: 'space-between',
   },
-  paper: {
+  container: {
     margin: '40px 32px',
   },
   onBoardingDialog: {
@@ -87,21 +91,48 @@ const useStyles = makeStyles(_ => ({
   subtitle: {
     margin: '16px 0',
   },
+  tooltip: {
+    backgroundColor: 'white',
+    color: 'black',
+    fontSize: '18px',
+    padding: '16px 8px',
+    pointerEvents: 'auto',
+  },
+  arrow: {
+    color: 'white',
+  },
+  paper: {
+    backgroundColor: '#FFFFFF',
+    minHeight: '56px',
+    display: 'flex',
+    alignItems: 'center',
+    minWidth: '350px',
+    padding: '16px',
+  },
+  popperHelperText: {
+    fontSize: '18px',
+  },
+  popperHelperSubtitle: {
+    maxWidth: '400px',
+    padding: '10px 0',
+  },
 }));
 
 type Props = {...WithAlert, hideAdvancedFields: boolean};
-
-function OnboardingDialog() {
+type OnboardingDialogType = {
+  open: boolean,
+  setOpen: boolean => void,
+};
+function OnboardingDialog(props: OnboardingDialogType) {
   const classes = useStyles();
-  const [open, setOpen] = useState(true);
   return (
     <Dialog
       classes={{paper: classes.onBoardingDialog}}
       maxWidth={'sm'}
       fullWidth={true}
-      open={open}
+      open={props.open}
       keepMounted
-      onClose={() => setOpen(false)}
+      onClose={() => props.setOpen(false)}
       aria-describedby="alert-dialog-slide-description">
       <DialogTitle classes={{root: classes.onBoardingDialogTitle}}>
         {'Welcome to Magma Host Portal'}
@@ -141,7 +172,7 @@ function OnboardingDialog() {
         <Button
           className={classes.onBoardingDialogButton}
           skin="comet"
-          onClick={() => setOpen(false)}>
+          onClick={() => props.setOpen(false)}>
           Get Started
         </Button>
       </DialogActions>
@@ -187,6 +218,12 @@ function Organizations(props: Props) {
   const [showOrganizationDialog, setShowOrganizationDialog] = useState(false);
   const [addUser, setAddUser] = useState(false);
   const enqueueSnackbar = useEnqueueSnackbar();
+  const createButtonRef = React.useRef(null);
+  const linkHelperRef = React.useRef(null);
+
+  const [showPopperHelper, setShowPopperHelper] = useState(true);
+  const [showPopperLinkHelper, setShowPopperLinkHelper] = useState(true);
+
   const {error, isLoading} = useAxios({
     url: '/host/organization/async',
     onResponse: useCallback(res => {
@@ -239,23 +276,49 @@ function Organizations(props: Props) {
       };
     },
   );
+
   return (
-    <div className={classes.paper}>
+    <div className={classes.container}>
       <Grid container>
         <Grid container justify="space-between">
           <Text variant="h3">Organizations</Text>
           <Button
             skin="comet"
+            ref={createButtonRef}
             className={classes.addButton}
             variant="contained"
-            onClick={() => setShowOrganizationDialog(true)}>
-            Add Organization
+            onClick={() => {
+              setShowOrganizationDialog(true);
+            }}>
+            Add Organizations
           </Button>
         </Grid>
+        <Popper
+          placement={'left-start'}
+          open={
+            !showOnboardingDialog &&
+            !showOrganizationDialog &&
+            organizations.length < 2 &&
+            showPopperHelper
+          }
+          anchorEl={createButtonRef.current}>
+          <Paper elevation={2} className={classes.paper}>
+            <Grid container alignContent="center" justify="space-around">
+              <span className={classes.popperHelperText}>
+                Start by adding an organization
+              </span>
+              <CloseIcon onClick={() => setShowPopperHelper(false)} />
+            </Grid>
+          </Paper>
+        </Popper>
+
         <Grid xs={12} className={classes.description}>
           <Text variant="body2">{ORGANIZATION_DESCRIPTION}</Text>
         </Grid>
-        <>{showOnboardingDialog && <OnboardingDialog />}</>
+        <OnboardingDialog
+          open={showOnboardingDialog}
+          setOpen={open => setShowOnboardingDialog(open)}
+        />
         <Grid xs={12}>
           <ActionTable
             data={organizationRows}
@@ -273,7 +336,24 @@ function Organizations(props: Props) {
               },
               {title: 'Name', field: 'name'},
               {title: 'Accessible Networks', field: 'networks'},
-              {title: 'Link to Organization Portal', field: 'portalLink'},
+              {
+                title: 'Link to Organization Portal',
+                field: 'portalLink',
+                render: rowData => {
+                  return (
+                    <Link
+                      variant="subtitle3"
+                      ref={
+                        organizations.length === rowData.tableData?.id + 1 &&
+                        organizations.length < 3
+                          ? linkHelperRef
+                          : null
+                      }>
+                      link to org
+                    </Link>
+                  );
+                },
+              },
               {title: 'Number of Users', field: 'userNumber'},
             ]}
             handleCurrRow={(row: OrganizationRowType) => {
@@ -310,6 +390,39 @@ function Organizations(props: Props) {
               toolbar: false,
             }}
           />
+          <Popper
+            open={!showOnboardingDialog && showPopperLinkHelper}
+            anchorEl={linkHelperRef.current}
+            placement={'bottom-end'}>
+            <Paper elevation={2} className={classes.paper}>
+              <Grid
+                container
+                alignContent="center"
+                justify="space-around"
+                direction="row">
+                <Grid>
+                  <div>
+                    <Grid container alignContent="center" direction="column">
+                      <span className={classes.popperHelperText}>
+                        Log into the Organization Portal
+                      </span>
+                      <span className={classes.popperHelperSubtitle}>
+                        Add and manage the Network, Access Gateway, Subscribers,
+                        and Policies for the organization.
+                      </span>
+                    </Grid>
+                  </div>
+                </Grid>
+                <Grid>
+                  <CloseIcon
+                    onClick={() => {
+                      setShowPopperLinkHelper(false);
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Paper>
+          </Popper>
         </Grid>
         <OrganizationDialog
           edit={false}

@@ -210,7 +210,6 @@ export default function (props: Props) {
         return;
       }
 
-      // }
       const newUser: CreateUserType = {
         email: user.email,
         password: user.password,
