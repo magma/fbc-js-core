@@ -1,5 +1,5 @@
 /**
- * Copyright 2004-present Facebook. All Rights Reserved.
+ * Copyright 2020 The Magma Authors.
  *
  * @format
  * @flow strict-local

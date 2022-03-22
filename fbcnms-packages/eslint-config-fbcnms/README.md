@@ -1,6 +1,6 @@
 # eslint-config-fbcnms
 
-This package provides Facebook NMS' eslint config as an extensible shared config. This is only used internally, use at your own risk.
+This package provides Magma NMS' eslint config as an extensible shared config. This is only used internally, use at your own risk.
 
 ## Usage
 

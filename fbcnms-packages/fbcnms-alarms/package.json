@@ -1,12 +1,12 @@
 {
   "name": "@fbcnms/alarms",
   "description": "UI components for alert configuration of prometheus and alertmanager.",
-  "author": "Facebook Connectivity",
+  "author": "Magma",
   "license": "BSD-2-Clause",
   "version": "1.0.5",
   "repository": {
     "type": "git",
-    "url": "https://github.com/facebookincubator/fbc-js-core.git",
+    "url": "https://github.com/magma/fbc-js-core.git",
     "directory": "fbcnms-packages/fbcnms-alarms"
   },
   "main": "lib/index.js",

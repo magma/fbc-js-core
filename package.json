@@ -2,7 +2,7 @@
   "name": "fbc",
   "private": true,
   "version": "0.1.1",
-  "description": "Code shared outside of Facebook for fbc",
+  "description": "Originally code shared outside of Facebook Connectivity, now used in Magma and Terragraph",
   "dependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.4.5",
