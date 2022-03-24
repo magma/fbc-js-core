@@ -20,7 +20,8 @@ export type Tab =
   | 'inventory'
   | 'nms'
   | 'workorders'
-  | 'hub';
+  | 'hub'
+  | 'assurance';
 
 export const TABS: {[string]: Tab} = Object.freeze({
   admin: 'admin',
@@ -29,6 +30,7 @@ export const TABS: {[string]: Tab} = Object.freeze({
   nms: 'nms',
   workorders: 'workorders',
   hub: 'hub',
+  assurance: 'assurance',
 });
 
 export function coerceToTab(tab: string): Tab {
