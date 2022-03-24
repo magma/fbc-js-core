@@ -13,12 +13,14 @@
  * @flow strict-local
  * @format
  */
-
+import type {EditUser} from './OrganizationEdit';
 import type {OrganizationPlainAttributes} from '@fbcnms/sequelize-models/models/organization';
 
+import AppContext from '@fbcnms/ui/context/AppContext';
 import Button from '@fbcnms/ui/components/design-system/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import LoadingFillerBackdrop from '@fbcnms/ui/components/LoadingFillerBackdrop';
 import OrganizationInfoDialog from './OrganizationInfoDialog';
@@ -28,43 +30,77 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 
 import {UserRoles} from '@fbcnms/auth/types';
-import {brightGray, white} from '@fbcnms/ui/theme/colors';
+import {brightGray, concrete, mirage, white} from '../theme/colors';
 import {makeStyles} from '@material-ui/styles';
 import {useAxios} from '@fbcnms/ui/hooks';
-import {useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 
 const useStyles = makeStyles(_ => ({
-  input: {
-    display: 'inline-flex',
-    margin: '5px 0',
-    width: '100%',
-  },
   tabBar: {
     backgroundColor: brightGray,
     color: white,
   },
+  dialog: {
+    backgroundColor: concrete,
+  },
+  dialogActions: {
+    backgroundColor: white,
+    padding: '20px',
+    zIndex: '1',
+  },
+  dialogContent: {
+    padding: '32px',
+    minHeight: '480px',
+  },
+  dialogTitle: {
+    backgroundColor: mirage,
+    padding: '16px 24px',
+    color: white,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
 }));
+type TabType =
+  | 'automation'
+  | 'admin'
+  | 'inventory'
+  | 'nms'
+  | 'workorders'
+  | 'hub';
 
 export type DialogProps = {
   error: string,
-  user: CreateUserType,
+  user: EditUser,
   organization: OrganizationPlainAttributes,
-  onUserChange: CreateUserType => void,
+  onUserChange: EditUser => void,
   onOrganizationChange: OrganizationPlainAttributes => void,
   // Array of networks ids
   allNetworks: Array<string>,
   // If true, enable all networks for an organization
   shouldEnableAllNetworks: boolean,
   setShouldEnableAllNetworks: boolean => void,
+  edit: boolean,
+  getProjectTabs?: () => Array<{id: TabType, name: string}>,
+  // flag to display advanced fields
+  hideAdvancedFields: boolean,
 };
 
 type Props = {
   onClose: () => void,
-  onCreateOrg: (org: CreateOrgType) => void,
+  onCreateOrg: (org: $Shape<OrganizationPlainAttributes>) => void,
   onCreateUser: (user: CreateUserType) => void,
   // flag to display create user tab
   addUser: boolean,
   setAddUser: () => void,
+  user: ?EditUser,
+  open: boolean,
+  organization: ?OrganizationPlainAttributes,
+  // editing organization
+  edit: boolean,
+  // flag to display advanced fields
+  hideAdvancedFields: boolean,
 };
 
 type CreateUserType = {
@@ -74,15 +110,10 @@ type CreateUserType = {
   organization?: string,
   role: ?string,
   tabs?: Array<string>,
-  password: string,
+  password: ?string,
   passwordConfirmation?: string,
 };
 
-type CreateOrgType = {
-  name: string,
-  networkIDs: Array<string>,
-  customDomains?: Array<string>,
-};
 /**
  * Create Orgnization Dilaog
  * This component displays a dialog with 2 tabs
@@ -90,6 +121,7 @@ type CreateOrgType = {
  * Second tab: OrganizationUserDialog, to create a user that belongs to the new organization
  */
 export default function (props: Props) {
+  const {ssoEnabled} = useContext(AppContext);
   const classes = useStyles();
   const {error, isLoading, response} = useAxios({
     method: 'get',
@@ -97,23 +129,38 @@ export default function (props: Props) {
   });
 
   const [organization, setOrganization] = useState<OrganizationPlainAttributes>(
-    {},
+    props.organization || {},
   );
-  const [currentTab, setCurrentTab] = useState(props.addUser ? 1 : 0);
+  const [currentTab, setCurrentTab] = useState(0);
   const [shouldEnableAllNetworks, setShouldEnableAllNetworks] = useState(false);
-  const [user, setUser] = useState<CreateUserType>({});
+  const [user, setUser] = useState<EditUser>(props.user || {});
   const [createError, setCreateError] = useState('');
   const allNetworks = error || !response ? [] : response.data.sort();
+  const organizationDialogTitle =
+    currentTab === 1
+      ? 'Add User'
+      : props.edit
+      ? 'Edit Organization'
+      : 'Add Organization';
+
+  useEffect(() => {
+    setCurrentTab(props.addUser ? 1 : 0);
+  }, [props.addUser]);
+
+  useEffect(() => {
+    setOrganization(props.organization || {});
+    setCreateError('');
+    setUser(props.user || {});
+  }, [props.open, props.organization, props.user]);
 
   if (isLoading) {
     return <LoadingFillerBackdrop />;
   }
-
   const createProps = {
     user,
     organization,
     error: createError,
-    onUserChange: (user: CreateUserType) => {
+    onUserChange: (user: EditUser) => {
       setUser(user);
     },
     onOrganizationChange: (organization: OrganizationPlainAttributes) => {
@@ -122,6 +169,8 @@ export default function (props: Props) {
     allNetworks,
     shouldEnableAllNetworks,
     setShouldEnableAllNetworks,
+    edit: props.edit,
+    hideAdvancedFields: props.hideAdvancedFields,
   };
   const onSave = async () => {
     if (currentTab === 0) {
@@ -129,35 +178,44 @@ export default function (props: Props) {
         setCreateError('Name cannot be empty');
         return;
       }
-      const payload = {
+      const newOrg = {
         name: organization.name,
         networkIDs: shouldEnableAllNetworks
           ? allNetworks
           : Array.from(organization.networkIDs || []),
         customDomains: [], // TODO
-        // tabs: Array.from(tabs),
+        // default tab is nms
+        tabs: Array.from(organization.tabs || ['nms']),
+        csvCharset: organization.csvCharset,
+        ssoSelectedType: organization.ssoSelectedType,
+        ssoCert: organization.ssoCert,
+        ssoEntrypoint: organization.ssoEntrypoint,
+        ssoIssuer: organization.ssoIssuer,
+        ssoOidcClientID: organization.ssoOidcClientID,
+        ssoOidcClientSecret: organization.ssoOidcClientSecret,
+        ssoOidcConfigurationURL: organization.ssoOidcConfigurationURL,
       };
 
-      props.onCreateOrg(payload);
+      props.onCreateOrg(newOrg);
       setCurrentTab(currentTab + 1);
       setCreateError('');
       props.setAddUser();
     } else {
-      if (!user.email) {
-        setCreateError('Email cannot be empty');
-        return;
-      }
-
-      if (!user.password) {
-        setCreateError('Password cannot be empty');
-        return;
-      }
       if (user.password != user.passwordConfirmation) {
         setCreateError('Passwords must match');
         return;
       }
+      if (!user?.email) {
+        setCreateError('Email cannot be empty');
+        return;
+      }
 
-      const payload: CreateUserType = {
+      if ((!user?.password ?? false) && !ssoEnabled && !user.id) {
+        setCreateError('Password cannot be empty');
+        return;
+      }
+
+      const newUser: CreateUserType = {
         email: user.email,
         password: user.password,
         role: user.role,
@@ -166,35 +224,46 @@ export default function (props: Props) {
             ? []
             : Array.from(user.networkIDs || []),
       };
-      props.onCreateUser(payload);
+      if ((user.id || ssoEnabled) && !user?.password) {
+        delete newUser.password;
+      }
+      props.onCreateUser(newUser);
     }
   };
 
   return (
     <Dialog
-      open={true}
+      classes={{paper: classes.dialog}}
+      open={props.open}
       onClose={props.onClose}
       maxWidth={'sm'}
       fullWidth={true}>
-      <DialogTitle>Add Organization</DialogTitle>
+      <DialogTitle classes={{root: classes.dialogTitle}}>
+        {Object.keys(user).length > 0 ? 'Edit User' : organizationDialogTitle}
+      </DialogTitle>
       <Tabs
         indicatorColor="primary"
         value={currentTab}
-        className={classes.tabBar}
+        classes={{root: classes.tabBar}}
         onChange={(_, v) => setCurrentTab(v)}>
         <Tab disabled={currentTab === 1} label={'Organization'} />
         <Tab disabled={currentTab === 0} label={'Users'} />
       </Tabs>
-      <>
+      <DialogContent classes={{root: classes.dialogContent}}>
         {currentTab === 0 && <OrganizationInfoDialog {...createProps} />}
         {currentTab === 1 && <OrganizationUserDialog {...createProps} />}
-      </>
-      <DialogActions>
+      </DialogContent>
+      <DialogActions classes={{root: classes.dialogActions}}>
         <Button onClick={props.onClose} skin="regular">
           Cancel
         </Button>
-        <Button skin="comet" onClick={onSave}>
-          {currentTab === 0 ? 'Save and Continue' : 'Save'}
+        <Button
+          disabled={
+            Object.keys(organization).length < 1 || organization?.id === ''
+          }
+          skin="comet"
+          onClick={onSave}>
+          {'Save'}
         </Button>
       </DialogActions>
     </Dialog>
