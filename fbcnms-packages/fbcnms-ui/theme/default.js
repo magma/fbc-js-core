@@ -21,13 +21,13 @@ import {
   blue60,
   blueGrayDark,
   brightGray,
+  comet,
   fadedBlue,
   gray0,
   gray00,
   gray1,
   gray13,
   gray50,
-  gullGray,
   primaryText,
   red,
   redwood,
@@ -182,7 +182,7 @@ export default createMuiTheme({
         },
       },
       input: {
-        color: gullGray,
+        color: comet,
         fontFamily: '"Inter", sans-serif',
         fontWeight: 600,
         fontSize: '12px',
@@ -192,6 +192,9 @@ export default createMuiTheme({
         paddingBottom: '12px',
         paddingTop: '12px',
         height: '24px',
+        '&::placeholder': {
+          color: '#8895ad',
+        },
         '&::-webkit-input-placeholder': {
           opacity: 1,
         },
