@@ -1,8 +1,8 @@
 # fbc-js-core
 
-Collection of JS packages used by different FBC projects ([Magma](https://github.com/magma/magma), Symphony and more). 
+Collection of JS packages used by different FBC projects ([Magma](https://github.com/magma/magma), Symphony and more).
 
-**CI/CD Status:** [![CircleCI](https://circleci.com/gh/facebookincubator/fbc-js-core/tree/master.svg?style=svg&circle-token=c1ceb3b7881163df18ea78b1742e6074d3c4fc8f)](https://circleci.com/gh/facebookincubator/fbc-js-core)
+**CI/CD Status:** [![CircleCI](https://circleci.com/gh/magma/fbc-js-core/tree/master.svg?style=svg&circle-token=c1ceb3b7881163df18ea78b1742e6074d3c4fc8f)](https://circleci.com/gh/magma/fbc-js-core)
 
 
 ## Testing
@@ -18,7 +18,7 @@ yarn run test
 Run `yarn test --coverage`
 
 ## Contributing
-In order to contribute to `fbc-js-core`, see the [CONTRIBUTING](CONTRIBUTING.md) file for how to go get started.  
+In order to contribute to `fbc-js-core`, see the [CONTRIBUTING](CONTRIBUTING.md) file for how to go get started.
 
 ## License
 

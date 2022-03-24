@@ -112,7 +112,7 @@ declare module 'fbt' {
 
   declare export type EnumValue = string | number;
 
-  // https://github.com/facebookincubator/fbt/blob/c2d363a40b622d5aaf80ff1d249b38604fd869f6/transform/babel-plugin-fbt/FbtConstants.js#L22-L27  ===> https://github.com/facebookincubator/fbt/blob/ffadd5fadd68179a2f0c3cde36ed080a49804203/runtime/shared/fbt.js#L64-L70
+  // https://github.com/magma/fbt/blob/c2d363a40b622d5aaf80ff1d249b38604fd869f6/transform/babel-plugin-fbt/FbtConstants.js#L22-L27  ===> https://github.com/facebookincubator/fbt/blob/ffadd5fadd68179a2f0c3cde36ed080a49804203/runtime/shared/fbt.js#L64-L70
 
   declare export type PronounType =
     | 'object'
